@@ -1,4 +1,12 @@
 # **Assignment: Full-Stack CRUD Application Development with DevOps Practices**
+## **Information**
+
+* **Student ID:** n12136069
+* **Student Name:** Thanh Tu Le
+* **Project:** Learning Management System
+* **JIRA Board:** [Link](https://lttcyborg.atlassian.net/jira/software/projects/ALMS/boards/5)
+* **Requirement Diagram:**
+![Requirement Diagram](doc/images/636-A1.drawio.png)
 
 ## **Objective**
 

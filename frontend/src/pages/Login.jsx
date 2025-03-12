@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
+import useFormValidation from '../hooks/useFormValidation';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [errors, setErrors] = useState({});
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -23,13 +21,12 @@ const Login = () => {
       tempErrors.password = "Password must be at least 6 characters";
     }
 
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0; // Returns true if no errors
+    return tempErrors;
   };
+  
+  const { formData, errors, handleChange, handleBlur, handleSubmit } = useFormValidation({ email: '', password: '' }, validate);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const onSubmit = async (e) => {
     try {
       const response = await axiosInstance.post('/api/auth/login', formData);
       login(response.data);
@@ -41,21 +38,25 @@ const Login = () => {
 
   return (
     <div className="max-w-md mx-auto mt-20">
-      <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
+      <form onSubmit={(e) => handleSubmit(e, onSubmit)} className="bg-white p-6 shadow-md rounded">
         <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
         <input
           type="email"
+          name="email"
           placeholder="Email"
           value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          onChange={handleChange}
+          onBlur={handleBlur}
           className="w-full mb-4 p-2 border rounded"
         />
         {errors.email && <p className="text-red-600 mb-2">{errors.email}</p>}
         <input
           type="password"
+          name="password"
           placeholder="Password"
           value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          onChange={handleChange}
+          onBlur={handleBlur}
           className="w-full mb-4 p-2 border rounded"
         />
         {errors.password && <p className="text-red-600 mb-2">{errors.password}</p>}

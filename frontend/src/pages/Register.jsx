@@ -1,10 +1,8 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
+import useFormValidation from '../hooks/useFormValidation';
 
 const Register = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', });
-  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const validate = () => {
@@ -31,13 +29,12 @@ const Register = () => {
       tempErrors.confirmPassword = "Passwords do not match";
     }
 
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
+    return tempErrors;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const { formData, errors, handleChange, handleBlur, handleSubmit } = useFormValidation({ name: '', email: '', password: '', confirmPassword: '', }, validate);
+
+  const onSubmit = async (e) => {
     try {
       await axiosInstance.post('/api/auth/register', {
         name: formData.name,
@@ -53,37 +50,45 @@ const Register = () => {
 
   return (
     <div className="max-w-md mx-auto mt-20">
-      <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
+      <form onSubmit={(e) => handleSubmit(e, onSubmit)} className="bg-white p-6 shadow-md rounded">
         <h1 className="text-2xl font-bold mb-4 text-center">Register</h1>
         <input
           type="text"
+          name="name"
           placeholder="Name"
           value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          onChange={handleChange}
+          onBlur={handleBlur}
           className="w-full mb-4 p-2 border rounded"
         />
         {errors.name && <p className="text-red-600 mb-2">{errors.name}</p>}
         <input
           type="email"
+          name="email"
           placeholder="Email"
           value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          onChange={handleChange}
+          onBlur={handleBlur}
           className="w-full mb-4 p-2 border rounded"
         />
         {errors.email && <p className="text-red-600 mb-2">{errors.email}</p>}
         <input
           type="password"
+          name="password"
           placeholder="Password"
           value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          onChange={handleChange}
+          onBlur={handleBlur}
           className="w-full mb-4 p-2 border rounded"
         />
         {errors.password && <p className="text-red-600 mb-2">{errors.password}</p>}
         <input
           type="password"
+          name="confirmPassword"
           placeholder="Confirm Password"
           value={formData.confirmPassword}
-          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+          onChange={handleChange}
+          onBlur={handleBlur}
           className="w-full mb-4 p-2 border rounded"
         />
         {errors.confirmPassword && <p className="text-red-600 mb-2">{errors.confirmPassword}</p>}

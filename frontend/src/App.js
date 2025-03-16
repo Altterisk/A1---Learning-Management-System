@@ -5,6 +5,9 @@ import Register from './pages/Register';
 import MemberList from './pages/Members/MemberList';
 import MemberEdit from './pages/Members/MemberEdit';
 import MemberCreate from './pages/Members/MemberCreate';
+import CourseList from './pages/Courses/CourseList';
+import CourseEdit from './pages/Courses/CourseEdit';
+import CourseCreate from './pages/Courses/CourseCreate';
 
 function App() {
   return (
@@ -16,6 +19,9 @@ function App() {
         <Route path="/members/list" element={<MemberList />} />
         <Route path="/members/edit/:id" element={<MemberEdit />} />
         <Route path="/members/create" element={<MemberCreate />} />
+        <Route path="/courses/list" element={<CourseList />} />
+        <Route path="/courses/edit/:id" element={<CourseEdit />} />
+        <Route path="/courses/create" element={<CourseCreate />} />
       </Routes>
     </Router>
   );

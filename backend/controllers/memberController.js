@@ -1,61 +1,72 @@
-const Member = require('../models/Member');
+const Member = require("../models/Member");
 
 const getMembers = async (req, res) => {
-    try {
-        const members = await Member.find({ userId: req.user.id });
-        res.json(members);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const members = await Member.find({ userId: req.user.id });
+    res.json(members);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 const getMember = async (req, res) => {
   try {
-      const member = await Member.findById(req.params.id);
-      if (!member) return res.status(404).json({ message: 'Member not found' });
-      res.json(member);
+    const member = await Member.findById(req.params.id);
+    if (!member) return res.status(404).json({ message: "Member not found" });
+    res.json(member);
   } catch (error) {
-      res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
 const addMember = async (req, res) => {
-    const { name, role, dateOfBirth } = req.body;
-    try {
-        const member = await Member.create({ userId: req.user.id, name, role, dateOfBirth });
-        res.status(201).json(member);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  const { name, role, dateOfBirth } = req.body;
+  try {
+    const member = await Member.create({
+      userId: req.user.id,
+      name,
+      role,
+      dateOfBirth,
+    });
+    res.status(201).json(member);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 const updateMember = async (req, res) => {
-    const { title, role, dateOfBirth } = req.body;
-    try {
-        const member = await Member.findById(req.params.id);
-        if (!member) return res.status(404).json({ message: 'Member not found' });
+  const { title, role, dateOfBirth } = req.body;
+  try {
+    const member = await Member.findById(req.params.id);
+    if (!member) return res.status(404).json({ message: "Member not found" });
 
-        member.title = title || member.title;
-        member.role = role || member.role;
-        member.dateOfBirth = dateOfBirth || member.dateOfBirth;
+    member.title = title || member.title;
+    member.role = role || member.role;
+    member.dateOfBirth = dateOfBirth || member.dateOfBirth;
 
-        const updatedMember = await member.save();
-        res.json(updatedMember);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+    const updatedMember = await member.save();
+    res.json(updatedMember);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 const deleteMember = async (req, res) => {
-    try {
-        const member = await Member.findById(req.params.id);
-        if (!member) return res.status(404).json({ message: 'Member not found' });
+  try {
+    const member = await Member.findById(req.params.id);
+    if (!member) return res.status(404).json({ message: "Member not found" });
 
-        await member.remove();
-        res.json({ message: 'Member deleted' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+    await member.remove();
+    res.json({ message: "Member deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-module.exports = { getMembers, getMember, addMember, updateMember, deleteMember };
+module.exports = {
+  getMembers,
+  getMember,
+  addMember,
+  updateMember,
+  deleteMember,
+};

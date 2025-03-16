@@ -16,7 +16,7 @@ const MemberList = ({ members, setMembers }) => {
 
   const handleDelete = async (memberId) => {
     try {
-      await axiosInstance.delete(`/api/Members/${memberId}`, {
+      await axiosInstance.delete(`/api/members/${memberId}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setMembers(members.filter((member) => member._id !== memberId));

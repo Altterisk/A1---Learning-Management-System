@@ -19,8 +19,6 @@ const CourseForm = ({ editingCourse, members }) => {
 
   useEffect(() => {
     if (editingCourse) {
-      console.log(members);
-      console.log(editingCourse.teacher?._id);
       setFormData({
         title: editingCourse.title || "",
         description: editingCourse.description || "",

@@ -8,7 +8,7 @@ const CourseList = ({ courses, setCourses }) => {
 
   const handleDelete = async (courseId) => {
     try {
-      await axiosInstance.delete(`/api/corses/${courseId}`, {
+      await axiosInstance.delete(`/api/courses/${courseId}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setCourses(courses.filter((course) => course._id !== courseId));

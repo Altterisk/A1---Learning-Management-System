@@ -8,69 +8,115 @@
 * **Requirement Diagram:**
 ![Requirement Diagram](doc/images/636-A1.drawio.png)
 
-## **Objective**
+## **Project Setup**
 
-You have been provided with a starter project that includes user authentication using  **Node.js, React.js, and MongoDB**. Your task is to extend this application by implementing **CRUD (Create, Read, Update, Delete) operations** for a real-world application of your choice, while following industry best practices such as:
+### **Cloning the Repository**
+Run the following code
+```
+git clone https://github.com/Altterisk/A1---Learning-Management-System.git
+cd A1---Learning-Management-System
+```
+### **Backend Setup**
+Setup MongooseDB and create a .env file inside the backend folder (for local testing)
+```
+MONGO_URI=<YOUR_MONGOOSE_URI>
+JWT_SECRET=<YOUR_JWT_SECRET>
+PORT=5001
+```
+Start the Backend
+```
+cd backend
+npm install
+npm run start
+```
+### **Frontend Setup**
+Start the Frontend
+```
+cd frontend
+npm install
+npm run start
+```
+## **CI/CD Pipeline**
+This project uses GitHub Actions for CI/CD automation, deploying with AWS LC2.
+### **Trigger Condition**
+The CI/CD pipeline runs automatically when code is pushed to the main branch.
+### **Workflow File**
+Workflow File: [Link](.github/workflows/ci.yml)
+### **Workflow Steps**
+* Clones the repository into the runner
+```
+- name: Checkout Code
+  uses: actions/checkout@v3
+```
 
-* **Project Management with JIRA**
-* **Requirement Diagram using SysML**
-* **Version Control using GitHub**
-* **CI/CD Integration for Automated Deployment**
+* Installs Node.js
+```
+- name: Setup Node.js
+  uses: actions/setup-node@v3
+  with:
+    node-version: ${{ matrix.node-version }}
+```
 
-## **Requirements**
+* Print Environment Secrets
+```
+- name: Print Env Secret
+  env:
+    MONGO_URI: ${{ secrets.MONGO_URI }}
+    JWT_SECRET: ${{ secrets.JWT_SECRET }}
+    PORT: ${{ secrets.PORT }}
+  run: |
+    echo "Secret 1 is: $MONGO_URI"
+    echo "Secret 2 is: $JWT_SECRET"
+    echo "Secret 3 is: $PORT"
+```
 
-### **1. Choose a Real-World Application**
+* Stop all running PM2 Processes
+```
+- run: pm2 stop all
+```
 
-Select a meaningful use case for your CRUD operations. We will provide the list, you have to select it.
+* Install Backend Dependencies
+```
+- name: Install Backend Dependencies
+  working-directory: ./backend
+  run: |
+    npm install --global yarn
+    yarn --version
+    yarn install
+```
 
-### **2. Project Management with JIRA and SysML**
+* Install Frontend Dependencies & Build
+```
+- name: Install Frontend Dependencies
+  working-directory: ./frontend
+  run: |
+    df -h
+    sudo rm -rf ./build
+    yarn install
+    yarn run build
+```
 
-* Create a **JIRA project** and define:
-  * **Epic**
-  * **User Stories** (features required in your app)
-  * **Child issues & Subtasks** (breaking down development work)
-  * **Sprint Planning** (organizing work into milestones)
-* Document your JIRA **board URL** in the project README.
-* Draw a requirements diagram
+* Run Backend Tests
+```
+- name: Run Backend Tests
+  env:
+    MONGO_URI: ${{ secrets.MONGO_URI }}
+    JWT_SECRET: ${{ secrets.JWT_SECRET }}
+    PORT: ${{ secrets.PORT }}
+  working-directory: ./backend
+  run: npm test
+```
 
-### **3. Backend Development (Node.js + Express + MongoDB)**
+* Writes the .env file using GitHub Secrets
+```
+- run: |
+    cd ./backend
+    touch .env
+    echo "${{ secrets.PROD }}" > .env
+```
 
-* Create a user-friendly interface to interact with your API (Some portion developed, follow task manager app)).
-* Implement **forms** for adding and updating records.
-* Display data using  **tables, cards, or lists (Follow how we showed data in task manager app)**
-
-### **4. Frontend Development (React.js)**
-
-* Create a user-friendly interface to interact with your API (**Some portion developed, follow task manager app)**.
-* Implement **forms** for adding, showing, deleting and updating records (CRUD).
-* Display data using  **tables, cards, or lists (Follow how we showed data in task manager app)**
-
-### **5. Authentication & Authorization**
-
-* Ensure **only authenticated users** can access and perform CRUD operations. (Already developed in your project)
-* Use **JWT (JSON Web Tokens)** for user authentication (Use the task manager one from .env file).
-
-### **6. GitHub Version Control & Branching Strategy**
-
-* Use **GitHub for version control** and maintain:
-  * `main` branch (stable production-ready code)
-  * Feature branches (`feature/xyz`) for each new functionality
-* Follow proper **commit messages** and  **pull request (PR) reviews** .
-
-### **7. CI/CD Pipeline Setup**
-
-* Implement a **CI/CD pipeline using GitHub Actions** to:
-  * Automatically **run tests** on every commit/pull request (Optional).
-  * Deploy the **backend** to **AWS** .
-  * Deploy the **frontend** to **AWS**.
-* Document your  **CI/CD workflow in the README** .
-
-## **Submission Requirements**
-
-* **JIRA Project Board URL** (user stories ).
-* **Requirment diagram** (Using project features)
-* **GitHub Repository** (`backend/` and `frontend/`).
-* **README.md** with:
-
-  * Project setup instructions.
-  * CI/CD pipeline details.
+* Restart PM2 Processes for deployment
+```
+- run: pm2 start all
+- run: pm2 restart all
+```

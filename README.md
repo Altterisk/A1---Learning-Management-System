@@ -7,6 +7,7 @@
 * **JIRA Board:** [Link](https://lttcyborg.atlassian.net/jira/software/projects/ALMS/boards/5)
 * **Requirement Diagram:**
 ![Requirement Diagram](doc/images/636-A1.drawio.png)
+* **Public Address:** [Link](http://3.27.76.157)
 
 ## **Project Setup**
 

@@ -90,7 +90,7 @@ const MemberList = ({ members, setMembers }) => {
                   <td className="px-4 py-2 border border-gray-200">{member.name}</td>
                   <td className="px-4 py-2 border border-gray-200">{member.role}</td>
                   <td className="px-4 py-2 border border-gray-200">
-                    {new Date(member.dateOfBirth).toLocaleDateString()}
+                    {member.dateOfBirth ? new Date(member.dateOfBirth).toLocaleDateString() : "N/A"}
                   </td>
                   <td className="px-4 py-2 border border-gray-200">
                     <button

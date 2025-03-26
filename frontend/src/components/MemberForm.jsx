@@ -1,29 +1,44 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
+import useFormValidation from '../hooks/useFormValidation';
 
 const MemberForm = ({ editingMember }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ name: '', role: 'Teacher', dateOfBirth: '' });
+
+  const validate = () => {
+    let tempErrors = {};
+    if (!formData.name) {
+      tempErrors.name = "Name is required";
+    }
+    if (!formData.role) {
+      tempErrors.role = "Role is required";
+    }
+
+    return tempErrors;
+  };
+  
+  const { formData, errors, handleChange, handleBlur, handleSubmit, setFormData } = useFormValidation({ name: '', role: 'Teacher', dateOfBirth: '' }, validate);
 
   useEffect(() => {
     if (editingMember) {
-      console.log(editingMember)
-      const formattedDate = editingMember.dateOfBirth ? new Date(editingMember.dateOfBirth).toISOString().split('T')[0] : '';
       setFormData({
-        name: editingMember.name,
-        role: editingMember.role,
-        dateOfBirth: formattedDate,
+        name: editingMember.name || "",
+        role: editingMember.role || "Teacher",
+        dateOfBirth: editingMember.dateOfBirth ? new Date(editingMember.dateOfBirth).toISOString().split('T')[0] : '',
       });
     } else {
-      setFormData({ name: '', role: 'Teacher', dateOfBirth: '' });
+      setFormData({
+        name: "",
+        role: "Teacher",
+        dateOfBirth: "",
+      });
     }
-  }, [editingMember]);
+  }, [editingMember, setFormData]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (e) => {
     try {
       if (editingMember) {
         await axiosInstance.put(`/api/members/${editingMember._id}`, formData, {
@@ -44,7 +59,7 @@ const MemberForm = ({ editingMember }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded mb-6">
+    <form onSubmit={(e) => handleSubmit(e, onSubmit)} className="bg-white p-6 shadow-md rounded mb-6">
       <h1 className="text-2xl font-bold mb-4">{editingMember ? 'Member Edit' : 'Member Creation'}</h1>
       <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
         Name
@@ -54,23 +69,29 @@ const MemberForm = ({ editingMember }) => {
         id="name"
         placeholder="Name"
         value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        name="name"
         className="w-full mb-4 p-2 border rounded"
         required
       />
+      {errors.name && <p className="text-red-600 mb-2">{errors.name}</p>}
       <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
         Role
       </label>
       <select
         id="role"
         value={formData.role}
-        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        name="role"
         className="w-full mb-4 p-2 border rounded"
         required
       >
         <option value="Teacher">Teacher</option>
         <option value="Student">Student</option>
       </select>
+      {errors.role && <p className="text-red-600 mb-2">{errors.role}</p>}
       <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-1">
         Date of Birth
       </label>
@@ -78,10 +99,12 @@ const MemberForm = ({ editingMember }) => {
         type="date"
         id="dateOfBirth"
         value={formData.dateOfBirth}
-        onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        name="dateOfBirth"
         className="w-full mb-4 p-2 border rounded"
-        required
       />
+      {errors.dateOfBirth && <p className="text-red-600 mb-2">{errors.dateOfBirth}</p>}
       <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
         {editingMember ? 'Update' : 'Create'}
       </button>

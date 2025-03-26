@@ -38,6 +38,7 @@ const useFormValidation = (initialState, validate) => {
     handleChange,
     handleBlur,
     handleSubmit,
+    setFormData,
   };
 };
 

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
+import useFormValidation from '../hooks/useFormValidation';
 
 const CourseForm = ({ editingCourse, members }) => {
   const { user } = useAuth();
@@ -9,13 +10,25 @@ const CourseForm = ({ editingCourse, members }) => {
 
   const teacherOptions = members.filter((member) => member.role === "Teacher");
 
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    teacher: "",
-    startDate: "",
-    endDate: "",
-  });
+  const validate = () => {
+    let tempErrors = {};
+    if (!formData.title) {
+      tempErrors.title = "Title is required";
+    }
+    if (!formData.description) {
+      tempErrors.description = "Description is required";
+    }
+
+    return tempErrors;
+  };
+  
+  const { formData, errors, handleChange, handleBlur, handleSubmit, setFormData } = useFormValidation({
+    title: '',
+    description: '',
+    teacher: '',
+    startDate: '',
+    endDate: ''
+  }, validate);
 
   useEffect(() => {
     if (editingCourse) {
@@ -35,10 +48,9 @@ const CourseForm = ({ editingCourse, members }) => {
         endDate: "",
       });
     }
-  }, [editingCourse]);
+  }, [editingCourse, setFormData]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (e) => {
     try {
       if (editingCourse) {
         await axiosInstance.put(`/api/courses/${editingCourse._id}`, formData, {
@@ -59,7 +71,7 @@ const CourseForm = ({ editingCourse, members }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded mb-6">
+    <form onSubmit={(e) => handleSubmit(e, onSubmit)} className="bg-white p-6 shadow-md rounded mb-6">
       <h1 className="text-2xl font-bold mb-4">{editingCourse ? "Edit Course" : "Create Course"}</h1>
 
       <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
@@ -70,10 +82,13 @@ const CourseForm = ({ editingCourse, members }) => {
         id="title"
         placeholder="Enter course title"
         value={formData.title}
-        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        name="title"
         className="w-full mb-4 p-2 border rounded"
         required
       />
+      {errors.title && <p className="text-red-600 mb-2">{errors.title}</p>}
 
       <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
         Course Description
@@ -82,9 +97,12 @@ const CourseForm = ({ editingCourse, members }) => {
         id="description"
         placeholder="Enter course description"
         value={formData.description}
-        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        name="description"
         className="w-full mb-4 p-2 border rounded"
       />
+      {errors.description && <p className="text-red-600 mb-2">{errors.description}</p>}
 
       <label htmlFor="teacher" className="block text-sm font-medium text-gray-700 mb-1">
         Assign a Teacher
@@ -94,7 +112,9 @@ const CourseForm = ({ editingCourse, members }) => {
         <select
           id="teacher"
           value={formData.teacher}
-          onChange={(e) => setFormData({ ...formData, teacher: e.target.value })}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          name="teacher"
           className="w-full mb-4 p-2 border rounded"
         >
           <option value="">Select a Teacher</option>
@@ -115,6 +135,7 @@ const CourseForm = ({ editingCourse, members }) => {
           </button>
         </p>
       )}
+      {errors.teacher && <p className="text-red-600 mb-2">{errors.teacher}</p>}
 
       <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
         Start Date
@@ -123,9 +144,12 @@ const CourseForm = ({ editingCourse, members }) => {
         type="date"
         id="startDate"
         value={formData.startDate}
-        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        name="startDate"
         className="w-full mb-4 p-2 border rounded"
       />
+      {errors.startDate && <p className="text-red-600 mb-2">{errors.startDate}</p>}
 
       <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
         End Date
@@ -134,9 +158,12 @@ const CourseForm = ({ editingCourse, members }) => {
         type="date"
         id="endDate"
         value={formData.endDate}
-        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        name="endDate"
         className="w-full mb-4 p-2 border rounded"
       />
+      {errors.endDate && <p className="text-red-600 mb-2">{errors.endDate}</p>}
 
       <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
         {editingCourse ? "Update Course" : "Create Course"}

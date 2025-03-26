@@ -42,7 +42,11 @@ const updateMember = async (req, res) => {
 
     member.title = title || member.title;
     member.role = role || member.role;
-    member.dateOfBirth = dateOfBirth || member.dateOfBirth;
+    if (dateOfBirth === '') {
+      member.dateOfBirth = null;
+    } else if (endDate) {
+      member.dateOfBirth = new Date(dateOfBirthdateOfBirth);
+    }
 
     const updatedMember = await member.save();
     res.json(updatedMember);

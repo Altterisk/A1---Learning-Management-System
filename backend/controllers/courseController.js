@@ -52,9 +52,20 @@ const updateCourse = async (req, res) => {
 
     course.title = title || course.title;
     course.description = description || course.description;
-    course.teacher = teacher || course.teacher; // Update teacher if provided
-    course.startDate = startDate ? new Date(startDate) : course.startDate;
-    course.endDate = endDate ? new Date(endDate) : course.endDate;
+    if (teacher !== undefined) {
+      course.teacher = teacher || null;
+    }
+    if (startDate === '') {
+      course.startDate = null;
+    } else if (startDate) {
+      course.startDate = new Date(startDate);
+    }
+
+    if (endDate === '') {
+      course.endDate = null;
+    } else if (endDate) {
+      course.endDate = new Date(endDate);
+    }
 
     const updatedCourse = await course.save();
     res.json(updatedCourse);

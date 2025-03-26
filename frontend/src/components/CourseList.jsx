@@ -7,6 +7,8 @@ const CourseList = ({ courses, setCourses }) => {
   const navigate = useNavigate();
 
   const handleDelete = async (courseId) => {
+    const isConfirmed = window.confirm('Are you sure you want to delete this course? This cannot be undo!');
+    if (!isConfirmed) return;
     try {
       await axiosInstance.delete(`/api/courses/${courseId}`, {
         headers: { Authorization: `Bearer ${user.token}` },

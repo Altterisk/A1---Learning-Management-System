@@ -15,6 +15,8 @@ const MemberList = ({ members, setMembers }) => {
   });
 
   const handleDelete = async (memberId) => {
+    const isConfirmed = window.confirm('Are you sure you want to delete this member? This cannot be undo!');
+    if (!isConfirmed) return;
     try {
       await axiosInstance.delete(`/api/members/${memberId}`, {
         headers: { Authorization: `Bearer ${user.token}` },

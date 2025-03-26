@@ -3,10 +3,10 @@ import { useAuth } from "../context/AuthContext";
 import Loading from "./Loading";
 
 const ProtectedRoute = ({ element }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (user === null) {
-    return <Loading/>;  // Or show a spinner or placeholder here
+  if (loading) {
+    return <Loading/>;
   }
 
   return user ? element : <Navigate to="/login" replace />;

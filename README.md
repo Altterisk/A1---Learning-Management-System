@@ -7,7 +7,7 @@
 * **JIRA Board:** [Link](https://lttcyborg.atlassian.net/jira/software/projects/ALMS/boards/5)
 * **Requirement Diagram:**
 ![Requirement Diagram](doc/images/636-A1.drawio.png)
-* **Public Address:** [Link](http://3.27.76.157)
+* **Public Address:** [Link](http://3.27.106.189)
 
 ## **Project Setup**
 
@@ -40,7 +40,7 @@ npm run start
 ## **CI/CD Pipeline**
 This project uses GitHub Actions for CI/CD automation, deploying with AWS LC2.
 ### **Trigger Condition**
-The CI/CD pipeline runs automatically when code is pushed to the main branch.
+The CI/CD pipeline runs automatically when code is pushed to the main branch. It can also be manually triggered with Github Action Page.
 ### **Workflow File**
 Workflow File: [Link](.github/workflows/ci.yml)
 ### **Workflow Steps**

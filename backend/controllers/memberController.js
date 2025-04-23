@@ -35,12 +35,12 @@ const addMember = async (req, res) => {
 };
 
 const updateMember = async (req, res) => {
-  const { title, role, dateOfBirth } = req.body;
+  const { name, role, dateOfBirth } = req.body;
   try {
     const member = await Member.findById(req.params.id);
     if (!member) return res.status(404).json({ message: "Member not found" });
 
-    member.title = title || member.title;
+    member.name = name || member.name;
     member.role = role || member.role;
     if (dateOfBirth === '') {
       member.dateOfBirth = null;

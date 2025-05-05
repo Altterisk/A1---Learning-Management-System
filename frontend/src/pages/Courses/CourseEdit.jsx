@@ -9,7 +9,7 @@ const Courses = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const [editingCourse, setEditingCourse] = useState(null);
-  const [members, setMembers] = useState(null);
+  const [users, setUsers] = useState(null);
   const [started, setStarted] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -22,10 +22,10 @@ const Courses = () => {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setEditingCourse(response.data);
-        const courseResponse = await axiosInstance.get(`/api/members`, {
+        const courseResponse = await axiosInstance.get(`/api/users`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        setMembers(courseResponse.data);
+        setUsers(courseResponse.data);
         setLoading(false);
       } catch (error) {
         alert('Failed to fetch Course.');
@@ -39,7 +39,7 @@ const Courses = () => {
     <div className="container mx-auto p-6">
     {!started && <Loading/>}
     {started && loading && <Loading/>}
-    {started && !loading && <CourseForm editingCourse={editingCourse} members={members}/>}
+    {started && !loading && <CourseForm editingCourse={editingCourse} users={users}/>}
     </div>
   );
 };

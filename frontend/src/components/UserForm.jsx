@@ -4,7 +4,7 @@ import axiosInstance from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import useFormValidation from '../hooks/useFormValidation';
 
-const MemberForm = ({ editingMember }) => {
+const UserForm = ({ editingUser }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -12,6 +12,9 @@ const MemberForm = ({ editingMember }) => {
     let tempErrors = {};
     if (!formData.name) {
       tempErrors.name = "Name is required";
+    }
+    if (!formData.email) {
+      tempErrors.email = "Email is required";
     }
     if (!formData.role) {
       tempErrors.role = "Role is required";
@@ -23,11 +26,12 @@ const MemberForm = ({ editingMember }) => {
   const { formData, errors, handleChange, handleBlur, handleSubmit, setFormData } = useFormValidation({ name: '', role: 'Teacher', dateOfBirth: '' }, validate);
 
   useEffect(() => {
-    if (editingMember) {
+    if (editingUser) {
       setFormData({
-        name: editingMember.name || "",
-        role: editingMember.role || "Teacher",
-        dateOfBirth: editingMember.dateOfBirth ? new Date(editingMember.dateOfBirth).toISOString().split('T')[0] : '',
+        name: editingUser.name || "",
+        email: editingUser.email || "",
+        role: editingUser.role || "Teacher",
+        dateOfBirth: editingUser.dateOfBirth ? new Date(editingUser.dateOfBirth).toISOString().split('T')[0] : '',
       });
     } else {
       setFormData({
@@ -36,31 +40,31 @@ const MemberForm = ({ editingMember }) => {
         dateOfBirth: "",
       });
     }
-  }, [editingMember, setFormData]);
+  }, [editingUser, setFormData]);
 
   const onSubmit = async (e) => {
     try {
-      if (editingMember) {
-        await axiosInstance.put(`/api/members/${editingMember._id}`, formData, {
+      if (editingUser) {
+        await axiosInstance.put(`/api/users/${editingUser._id}`, formData, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        alert('Member updated successfully!');
+        alert('User updated successfully!');
       } else {
-        await axiosInstance.post('/api/members', formData, {
+        const response = await axiosInstance.post('/api/users', formData, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        alert('Member created successfully!');
+        alert(`User created successfully!\nThe default password is ${response.password}`);
       }
-      navigate('/members/list');
+      navigate('/users/list');
     } catch (error) {
-      alert('Failed to save Member.');
+      alert('Failed to save User.');
       alert(error);
     }
   };
 
   return (
     <form onSubmit={(e) => handleSubmit(e, onSubmit)} className="bg-white p-6 shadow-md rounded mb-6">
-      <h1 className="text-2xl font-bold mb-4">{editingMember ? 'Member Edit' : 'Member Creation'}</h1>
+      <h1 className="text-2xl font-bold mb-4">{editingUser ? 'User Edit' : 'User Creation'}</h1>
       <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
         Name
       </label>
@@ -76,6 +80,20 @@ const MemberForm = ({ editingMember }) => {
         required
       />
       {errors.name && <p className="text-red-600 mb-2">{errors.name}</p>}
+      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+        Email
+      </label>
+      <input
+        type="email"
+        id="email"
+        placeholder="Email"
+        value={formData.email}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        name="email"
+        className="w-full mb-4 p-2 border rounded"
+      />
+      {errors.email && <p className="text-red-600 mb-2">{errors.email}</p>}
       <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
         Role
       </label>
@@ -106,10 +124,10 @@ const MemberForm = ({ editingMember }) => {
       />
       {errors.dateOfBirth && <p className="text-red-600 mb-2">{errors.dateOfBirth}</p>}
       <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
-        {editingMember ? 'Update' : 'Create'}
+        {editingUser ? 'Update' : 'Create'}
       </button>
     </form>
   );
 };
 
-export default MemberForm;
+export default UserForm;

@@ -40,6 +40,7 @@ const Register = () => {
         name: formData.name,
         email: formData.email,
         password: formData.password,
+        role: "Admin",
       });
       alert('Registration successful. Please log in.');
       navigate('/login');

@@ -2,7 +2,7 @@ const Course = require("../models/Course");
 
 const getCourses = async (req, res) => {
   try {
-    const courses = await Course.find({ userId: req.user.id }).populate({
+    const courses = await Course.find().populate({
       path: "teacher",
       select: "name",
       match: { role: "Teacher" },
@@ -31,7 +31,6 @@ const addCourse = async (req, res) => {
   const { title, description, teacher, startDate, endDate } = req.body;
   try {
     const course = await Course.create({
-      userId: req.user.id,
       title,
       description,
       teacher,

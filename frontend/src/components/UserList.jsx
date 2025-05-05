@@ -3,27 +3,27 @@ import axiosInstance from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
-const MemberList = ({ members, setMembers }) => {
+const UserList = ({ users, setUsers }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
 
   
-  const filteredMembers = members.filter((member) => {
-    if (filter === 'all') return true; // Show all members
-    return member.role === filter; // Show only Teachers or Students
+  const filteredUsers = users.filter((user) => {
+    if (filter === 'all') return true; // Show all users
+    return user.role === filter; // Show only Teachers or Students
   });
 
-  const handleDelete = async (memberId) => {
-    const isConfirmed = window.confirm('Are you sure you want to delete this member? This cannot be undo!');
+  const handleDelete = async (userId) => {
+    const isConfirmed = window.confirm('Are you sure you want to delete this user? This cannot be undo!');
     if (!isConfirmed) return;
     try {
-      await axiosInstance.delete(`/api/members/${memberId}`, {
+      await axiosInstance.delete(`/api/users/${userId}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setMembers(members.filter((member) => member._id !== memberId));
+      setUsers(users.filter((user) => user._id !== userId));
     } catch (error) {
-      alert('Failed to delete Member.');
+      alert('Failed to delete User.');
       console.log(error)
     }
   };
@@ -32,14 +32,14 @@ const MemberList = ({ members, setMembers }) => {
     <div>
       <div className="flex justify-end">
         <button
-          onClick={() => navigate('/members/create')}
+          onClick={() => navigate('/users/create')}
           className="mb-4 bg-green-500 text-white px-4 py-2 rounded"
         >
-          Create New Member
+          Create New User
         </button>
       </div>
-      {members.length === 0 ? (
-        <p className="text-gray-500">No members found. Click "Create New Member" to add one.</p>
+      {users.length === 0 ? (
+        <p className="text-gray-500">No users found. Click "Create New User" to add one.</p>
       ) : (
         <div>
           <div className="mb-4">
@@ -85,22 +85,22 @@ const MemberList = ({ members, setMembers }) => {
               </tr>
             </thead>
             <tbody>
-              {filteredMembers.map((member) => (
-                <tr key={member._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 border border-gray-200">{member.name}</td>
-                  <td className="px-4 py-2 border border-gray-200">{member.role}</td>
+              {filteredUsers.map((user) => (
+                <tr key={user._id} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 border border-gray-200">{user.name}</td>
+                  <td className="px-4 py-2 border border-gray-200">{user.role}</td>
                   <td className="px-4 py-2 border border-gray-200">
-                    {member.dateOfBirth ? new Date(member.dateOfBirth).toLocaleDateString() : "N/A"}
+                    {user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "N/A"}
                   </td>
                   <td className="px-4 py-2 border border-gray-200">
                     <button
-                      onClick={() => navigate(`/members/edit/${member._id}`)}
+                      onClick={() => navigate(`/users/edit/${user._id}`)}
                       className="mr-2 bg-yellow-500 text-white px-3 py-1 rounded"
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(member._id)}
+                      onClick={() => handleDelete(user._id)}
                       className="bg-red-500 text-white px-3 py-1 rounded"
                     >
                       Delete
@@ -116,4 +116,4 @@ const MemberList = ({ members, setMembers }) => {
   );
 };
 
-export default MemberList;
+export default UserList;

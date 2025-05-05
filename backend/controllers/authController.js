@@ -4,6 +4,7 @@ const UserFactory = require('../factories/userFactory')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const RoleStrategyContext = require('../strategies/userFilterStartegy');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
@@ -103,7 +104,10 @@ const changePassword = async (req, res) => {
 
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        const roleContext = new RoleStrategyContext(req.user);
+        const filter = roleContext.getFilter();
+
+        const users = await User.find(filter);
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -112,8 +116,11 @@ const getUsers = async (req, res) => {
 
 const getUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        const roleContext = new RoleStrategyContext(req.user);  // Pass user to context
+        const filter = roleContext.getFilter();  // Get filter based on role
+
+        const user = await User.findOne({ _id: req.params.id, ...filter });
+        if (!user) return res.status(404).json({ message: 'User not found or not allowed' });
         res.json(user);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -127,7 +134,6 @@ const addUser = async (req, res) => {
         if (userExists) return res.status(400).json({ message: 'User already exists' });
         const password = generateRandomPassword();
         const newUser = await UserFactory.createUser({ firstName, lastName, email, password, role, dateOfBirth });
-        console.log(newUser)
         // Should not actually send password in real system, use mail instead
         res.status(201).json({
             user: {

@@ -9,6 +9,7 @@ const sinon = require('sinon');
 const User = require('../models/User');
 const { updateUser, getUsers, getUser, addUser, deleteUser } = require('../controllers/authController');
 const Teacher = require('../models/Teacher');
+const RoleStrategyContext = require('../strategies/userFilterStartegy');
 const { expect } = chai;
 
 chai.use(chaiHttp);
@@ -64,9 +65,13 @@ describe('AddUser Function Test', () => {
 
     // Restore stubbed methods
     createStub.restore();
+    findOneStub.restore();
   });
 
   it('should return 500 if an error occurs', async () => {
+    
+    // Stub User.findOne to return null (no existing user)
+    const findOneStub = sinon.stub(User, 'findOne').resolves(null);
     // Stub User.create to throw an error
     const createStub = sinon.stub(Teacher, 'create').throws(new Error('DB Error'));
 
@@ -91,6 +96,7 @@ describe('AddUser Function Test', () => {
 
     // Restore stubbed methods
     createStub.restore();
+    findOneStub.restore();
   });
 
 });
@@ -188,7 +194,7 @@ describe('GetUsers Function Test', () => {
     const findStub = sinon.stub(User, 'find').resolves(users);
 
     // Mock request & response
-    const req = {  };
+    const req = { user: { id: new mongoose.Types.ObjectId(), role: 'Admin' } };
     const res = {
       json: sinon.spy(),
       status: sinon.stub().returnsThis()
@@ -211,7 +217,7 @@ describe('GetUsers Function Test', () => {
     const findStub = sinon.stub(User, 'find').throws(new Error('DB Error'));
 
     // Mock request & response
-    const req = { user: { id: new mongoose.Types.ObjectId() } };
+    const req = { user: { id: new mongoose.Types.ObjectId(), role: 'Admin' } };
     const res = {
       json: sinon.spy(),
       status: sinon.stub().returnsThis()
@@ -328,71 +334,78 @@ describe('GetUser Function Test', () => {
     };
 
     // Stub User.findById to return the mock user
-    const findByIdStub = sinon.stub(User, 'findById').resolves(mockUser);
+    const findOneStub = sinon.stub(User, 'findOne').resolves(mockUser);
 
     // Mock request & response
-    const req = { params: { id: userId } };
+    const req = { user: { id: new mongoose.Types.ObjectId(), role: 'Admin' }, params: { id: userId } };
     const res = {
       json: sinon.spy(),
       status: sinon.stub().returnsThis()
     };
+    const filter = new RoleStrategyContext({ id: new mongoose.Types.ObjectId(), role: 'Admin' }).getFilter();
 
     // Call function
     await getUser(req, res);
 
     // Assertions
-    expect(findByIdStub.calledOnceWith(userId)).to.be.true;
+    expect(findOneStub.calledOnceWith({ _id: userId, ...filter })).to.be.true;
     expect(res.json.calledWith(mockUser)).to.be.true;
     expect(res.status.called).to.be.false;
 
     // Restore stubbed methods
-    findByIdStub.restore();
+    findOneStub.restore();
   });
 
   it('should return 404 if user is not found', async () => {
+    
+    const userId = new mongoose.Types.ObjectId();
     // Stub User.findById to return null (user not found)
-    const findByIdStub = sinon.stub(User, 'findById').resolves(null);
+    const findOneStub = sinon.stub(User, 'findOne').resolves(null);
 
     // Mock request & response
-    const req = { params: { id: new mongoose.Types.ObjectId() } };
+    const req = { user: { id: new mongoose.Types.ObjectId(), role: 'Admin' }, params: { id: userId } };
     const res = {
       status: sinon.stub().returnsThis(),
       json: sinon.spy()
     };
+    const filter = new RoleStrategyContext({ id: new mongoose.Types.ObjectId(), role: 'Admin' }).getFilter();
 
     // Call function
     await getUser(req, res);
 
     // Assertions
-    expect(findByIdStub.calledOnceWith(req.params.id)).to.be.true;
+    expect(findOneStub.calledOnceWith({ _id: userId, ...filter })).to.be.true;
     expect(res.status.calledWith(404)).to.be.true;
-    expect(res.json.calledWith({ message: 'User not found' })).to.be.true;
+    expect(res.json.calledWith({ message: 'User not found or not allowed' })).to.be.true;
 
     // Restore stubbed methods
-    findByIdStub.restore();
+    findOneStub.restore();
   });
 
   it('should return 500 if an error occurs', async () => {
+    
+    const userId = new mongoose.Types.ObjectId();
     // Stub User.findById to throw an error
-    const findByIdStub = sinon.stub(User, 'findById').throws(new Error('DB Error'));
+    const findOneStub = sinon.stub(User, 'findOne').throws(new Error('DB Error'));
 
     // Mock request & response
-    const req = { params: { id: new mongoose.Types.ObjectId() } };
+    const req = { user: { id: new mongoose.Types.ObjectId(), role: 'Admin' }, params: { id: userId } };
     const res = {
       status: sinon.stub().returnsThis(),
       json: sinon.spy()
     };
+    const filter = new RoleStrategyContext({ id: new mongoose.Types.ObjectId(), role: 'Admin' }).getFilter();
 
     // Call function
     await getUser(req, res);
 
     // Assertions
-    expect(findByIdStub.calledOnceWith(req.params.id)).to.be.true;
+    expect(findOneStub.calledOnceWith({ _id: userId, ...filter })).to.be.true;
     expect(res.status.calledWith(500)).to.be.true;
     expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
 
     // Restore stubbed methods
-    findByIdStub.restore();
+    findOneStub.restore();
   });
 
 });

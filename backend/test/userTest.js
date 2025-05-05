@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const sinon = require('sinon');
 const User = require('../models/User');
 const { updateUser, getUsers, getUser, addUser, deleteUser } = require('../controllers/authController');
+const Teacher = require('../models/Teacher');
 const { expect } = chai;
 
 chai.use(chaiHttp);
@@ -20,7 +21,7 @@ describe('AddUser Function Test', () => {
   it('should create a new user successfully', async () => {
     // Mock request data
     const req = {
-      body: { name: "El Mofus", email: "el@gmail.com", role: "Teacher", dateOfBirth: "2018-02-23" }
+      body: { firstName: "El", lastName: "Mofus", email: "el@gmail.com", role: "Teacher", dateOfBirth: "2018-02-23" }
     };
 
     // Mock user that would be created
@@ -31,7 +32,7 @@ describe('AddUser Function Test', () => {
     const findOneStub = sinon.stub(User, 'findOne').resolves(null);
 
     // Stub User.create to return the createdUser
-    const createStub = sinon.stub(User, 'create').resolves(createdUser);
+    const createStub = sinon.stub(Teacher, 'create').resolves(createdUser);
 
     // Mock response object
     const res = {
@@ -48,7 +49,8 @@ describe('AddUser Function Test', () => {
     const createArg = createStub.firstCall.args[0];
     
     // Check the controlled fields
-    expect(createArg.name).to.equal(req.body.name);
+    expect(createArg.firstName).to.equal(req.body.firstName);
+    expect(createArg.lastName).to.equal(req.body.lastName);
     expect(createArg.email).to.equal(req.body.email);
     expect(createArg.role).to.equal(req.body.role);
     expect(createArg.dateOfBirth).to.equal(req.body.dateOfBirth);
@@ -57,8 +59,8 @@ describe('AddUser Function Test', () => {
     expect(createArg.password).to.be.a('string');
     expect(createArg.password.length).to.be.greaterThan(0);
     expect(res.status.calledWith(201)).to.be.true;
-    expect(res.json.calledWith(sinon.match.has('_id'))).to.be.true;
-    expect(res.json.firstCall.args[0].email).to.equal(req.body.email);
+    expect(res.json.calledWith(sinon.match.hasNested('user._id'))).to.be.true;
+    expect(res.json.firstCall.args[0].user.email).to.equal(req.body.email);
 
     // Restore stubbed methods
     createStub.restore();
@@ -66,12 +68,12 @@ describe('AddUser Function Test', () => {
 
   it('should return 500 if an error occurs', async () => {
     // Stub User.create to throw an error
-    const createStub = sinon.stub(User, 'create').throws(new Error('DB Error'));
+    const createStub = sinon.stub(Teacher, 'create').throws(new Error('DB Error'));
 
     // Mock request data
     const req = {
       user: { id: new mongoose.Types.ObjectId() },
-      body: { name: "El Mofus", email: "el@gmail.com", password: "123456", role: "Teacher", dateOfBirth: "2018-02-23" }
+      body: { firstName: "El", lastName: "Mofus", email: "el@gmail.com", password: "123456", role: "Teacher", dateOfBirth: "2018-02-23" }
     };
 
     // Mock response object
@@ -100,7 +102,7 @@ describe('UpdateUser Function Test', () => {
     const userId = new mongoose.Types.ObjectId();
     const existingUser = {
       _id: userId,
-      name: "El Mofus",
+      firstName: "El", lastName: "Mofus",
       role: "Teacher",
       email: "el@gmail.com",
       password: "123456",
@@ -113,7 +115,7 @@ describe('UpdateUser Function Test', () => {
     // Mock request & response
     const req = {
       params: { id: userId },
-      body: { name: "El Mofus", email: "el@gmail.com", password: "123456", role: "Student", dateOfBirth: "1989-07-15" }
+      body: { firstName: "El", lastName: "Mofus", email: "el@gmail.com", password: "123456", role: "Student", dateOfBirth: "1989-07-15" }
     };
     const res = {
       json: sinon.spy(), 
@@ -124,7 +126,8 @@ describe('UpdateUser Function Test', () => {
     await updateUser(req, res);
 
     // Assertions
-    expect(existingUser.name).to.equal("El Mofus");
+    expect(existingUser.firstName).to.equal("El");
+    expect(existingUser.lastName).to.equal("Mofus");
     expect(existingUser.role).to.equal("Student");
     expect(existingUser.email).to.equal("el@gmail.com");
     existingUser.dateOfBirth = new Date(existingUser.dateOfBirth);
@@ -177,8 +180,8 @@ describe('GetUsers Function Test', () => {
 
     // Mock user data
     const users = [
-      { _id: new mongoose.Types.ObjectId(), name: "El Mofus", email: "el@gmail.com", password: "123456", role: "Teacher", dateOfBirth: new Date("2018-02-23")},
-      { _id: new mongoose.Types.ObjectId(), name: "Crook Mofus", email: "crook@gmail.com", password: "123456", role: "Student", dateOfBirth: new Date("1989-07-15") }
+      { _id: new mongoose.Types.ObjectId(), firstName: "El", lastName: "Mofus", email: "el@gmail.com", password: "123456", role: "Teacher", dateOfBirth: new Date("2018-02-23")},
+      { _id: new mongoose.Types.ObjectId(), firstName: "Crook", lastName: "Mofus", email: "crook@gmail.com", password: "123456", role: "Student", dateOfBirth: new Date("1989-07-15") }
     ];
 
     // Stub User.find to return mock users

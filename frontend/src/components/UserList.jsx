@@ -87,7 +87,7 @@ const UserList = ({ users, setUsers }) => {
             <tbody>
               {filteredUsers.map((user) => (
                 <tr key={user._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 border border-gray-200">{user.name}</td>
+                  <td className="px-4 py-2 border border-gray-200">{`${user.firstName} ${user.lastName}`} </td>
                   <td className="px-4 py-2 border border-gray-200">{user.role}</td>
                   <td className="px-4 py-2 border border-gray-200">
                     {user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "N/A"}

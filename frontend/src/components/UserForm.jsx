@@ -10,8 +10,11 @@ const UserForm = ({ editingUser }) => {
 
   const validate = () => {
     let tempErrors = {};
-    if (!formData.name) {
-      tempErrors.name = "Name is required";
+    if (!formData.firstName) {
+      tempErrors.firstName = "First Name is required";
+    }
+    if (!formData.lastName) {
+      tempErrors.lastName = "Last Name is required";
     }
     if (!formData.email) {
       tempErrors.email = "Email is required";
@@ -23,19 +26,21 @@ const UserForm = ({ editingUser }) => {
     return tempErrors;
   };
   
-  const { formData, errors, handleChange, handleBlur, handleSubmit, setFormData } = useFormValidation({ name: '', role: 'Teacher', dateOfBirth: '' }, validate);
+  const { formData, errors, handleChange, handleBlur, handleSubmit, setFormData } = useFormValidation({ firstName: '', lastName: '', role: 'Teacher', dateOfBirth: '' }, validate);
 
   useEffect(() => {
     if (editingUser) {
       setFormData({
-        name: editingUser.name || "",
+        firstName: editingUser.firstName || "",
+        lastName: editingUser.lastName || "",
         email: editingUser.email || "",
         role: editingUser.role || "Teacher",
         dateOfBirth: editingUser.dateOfBirth ? new Date(editingUser.dateOfBirth).toISOString().split('T')[0] : '',
       });
     } else {
       setFormData({
-        name: "",
+        firstName: "",
+        lastName: "",
         role: "Teacher",
         dateOfBirth: "",
       });
@@ -53,7 +58,7 @@ const UserForm = ({ editingUser }) => {
         const response = await axiosInstance.post('/api/users', formData, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        alert(`User created successfully!\nThe default password is ${response.password}`);
+        alert(`User created successfully!\nThe default password is ${response.data.password}`);
       }
       navigate('/users/list');
     } catch (error) {
@@ -65,21 +70,36 @@ const UserForm = ({ editingUser }) => {
   return (
     <form onSubmit={(e) => handleSubmit(e, onSubmit)} className="bg-white p-6 shadow-md rounded mb-6">
       <h1 className="text-2xl font-bold mb-4">{editingUser ? 'User Edit' : 'User Creation'}</h1>
-      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-        Name
+      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+        First Name
       </label>
       <input
         type="text"
-        id="name"
-        placeholder="Name"
-        value={formData.name}
+        id="firstName"
+        placeholder="First Name"
+        value={formData.firstName}
         onChange={handleChange}
         onBlur={handleBlur}
-        name="name"
+        name="firstName"
         className="w-full mb-4 p-2 border rounded"
         required
       />
-      {errors.name && <p className="text-red-600 mb-2">{errors.name}</p>}
+      {errors.firstName && <p className="text-red-600 mb-2">{errors.firstName}</p>}
+      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+        Last Name
+      </label>
+      <input
+        type="text"
+        id="lastName"
+        placeholder="Last Name"
+        value={formData.lastName}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        name="lastName"
+        className="w-full mb-4 p-2 border rounded"
+        required
+      />
+      {errors.lastName && <p className="text-red-600 mb-2">{errors.lastName}</p>}
       <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
         Email
       </label>

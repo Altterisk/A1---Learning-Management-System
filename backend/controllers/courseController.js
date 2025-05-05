@@ -4,7 +4,7 @@ const getCourses = async (req, res) => {
   try {
     const courses = await Course.find().populate({
       path: "teacher",
-      select: "name",
+      select: "firstName lastName",
       match: { role: "Teacher" },
     });
     res.json(courses);
@@ -17,7 +17,7 @@ const getCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id).populate({
       path: "teacher",
-      select: "name",
+      select: "firstName lastName",
       match: { role: "Teacher" },
     });
     if (!course) return res.status(404).json({ message: "Course not found" });

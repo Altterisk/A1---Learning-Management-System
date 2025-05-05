@@ -1,5 +1,6 @@
 
 const User = require('../models/User');
+const UserFactory = require('../factories/userFactory')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -13,13 +14,13 @@ const generateRandomPassword = (length = 12) => {
 };
 
 const registerUser = async (req, res) => {
-    const { name, email, password, role, dateOfBirth } = req.body;
+    const { firstName, lastName, email, password, role, dateOfBirth } = req.body;
     try {
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: 'User already exists' });
 
-        const user = await User.create({ name, email, password, role, dateOfBirth });
-        res.status(201).json({ id: user.id, name: user.name, email: user.email, role: user.role, token: generateToken(user.id) });
+        const user = await UserFactory.createUser({ firstName, lastName, email, password, role, dateOfBirth });
+        res.status(201).json({ id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, role: user.role, token: generateToken(user.id) });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -30,7 +31,7 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (user && (await bcrypt.compare(password, user.password))) {
-            res.json({ id: user.id, name: user.name, email: user.email, role: user.role, token: generateToken(user.id) });
+            res.json({ id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, role: user.role, token: generateToken(user.id) });
         } else {
             res.status(401).json({ message: 'Invalid email or password' });
         }
@@ -46,7 +47,8 @@ const getProfile = async (req, res) => {
 
         res.status(200).json({
             id: user.id,
-            name: user.name,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             role: user.role, 
             dateOfBirth: user.dateOfBirth,
@@ -77,26 +79,38 @@ const getUser = async (req, res) => {
 };
 
 const addUser = async (req, res) => {
-    const { name, email, role, dateOfBirth } = req.body;
+    const { firstName, lastName, email, role, dateOfBirth } = req.body;
     try {
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: 'User already exists' });
         const password = generateRandomPassword();
-        const newUser = await User.create({ name, email, password, role, dateOfBirth });
+        const newUser = await UserFactory.createUser({ firstName, lastName, email, password, role, dateOfBirth });
+        console.log(newUser)
         // Should not actually send password in real system, use mail instead
-        res.status(201).json(newUser);
+        res.status(201).json({
+            user: {
+                _id: newUser._id,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                email: newUser.email,
+                role: newUser.role,
+                dateOfBirth: newUser.dateOfBirth,
+            },
+            password: password
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
 const updateUser = async (req, res) => {
-    const { name, role, dateOfBirth } = req.body;
+    const { firstName, lastName, role, dateOfBirth } = req.body;
     try {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        user.name = name || user.name;
+        user.firstName = firstName || user.firstName;
+        user.lastName = lastName || user.lastName;
         user.role = role || user.role;
 
         if (dateOfBirth === '') {

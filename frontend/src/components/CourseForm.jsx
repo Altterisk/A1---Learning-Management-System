@@ -120,7 +120,7 @@ const CourseForm = ({ editingCourse, users }) => {
           <option value="">Select a Teacher</option>
           {teacherOptions.map((user) => (
             <option key={user._id} value={user._id}>
-              {user.name}
+              {`${user.firstName} ${user.lastName}`}
             </option>
           ))}
         </select>

@@ -18,7 +18,6 @@ export const AuthProvider = ({ children }) => {
       const response = await axiosInstance.get("/api/auth/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(response.data)
       setUser(response.data);
     } catch (error) {
       localStorage.removeItem("token");
@@ -36,8 +35,13 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateData = (userData) => {
+    const existingToken = localStorage.getItem("token");
+    setUser({ ...userData, token: existingToken });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, updateData }}>
       {children}
     </AuthContext.Provider>
   );

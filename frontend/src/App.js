@@ -11,6 +11,8 @@ import CourseCreate from './pages/Courses/CourseCreate';
 import NotFound from './pages/NotFound';
 import Home from './pages/Home'
 import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from './pages/Profile';
+import ChangePassword from './pages/ChangePassword';
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
+        <Route path="/changePassword" element={<ProtectedRoute element={<ChangePassword />} />} />
         <Route path="/users/list" element={<ProtectedRoute element={<UserList />} />} />
         <Route path="/users/edit/:id" element={<ProtectedRoute element={<UserEdit />} />} />
         <Route path="/users/create" element={<ProtectedRoute element={<UserCreate />} />} />

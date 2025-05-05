@@ -59,6 +59,48 @@ const getProfile = async (req, res) => {
     }
 };
 
+const updateProfile = async (req, res) => {
+    const { firstName, lastName, dateOfBirth } = req.body;
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        user.firstName = firstName || user.firstName;
+        user.lastName = lastName || user.lastName;
+
+        if (dateOfBirth === '') {
+            user.dateOfBirth = null;
+        } else if (dateOfBirth) {
+            user.dateOfBirth = new Date(dateOfBirth);
+        }
+
+        const updatedUser = await user.save();
+        res.json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const changePassword = async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: "Password updated successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const getUsers = async (req, res) => {
     try {
         const users = await User.find();
@@ -142,6 +184,8 @@ module.exports = {
     registerUser,
     loginUser,
     getProfile,
+    updateProfile,
+    changePassword,
     getUsers,
     getUser,
     addUser,

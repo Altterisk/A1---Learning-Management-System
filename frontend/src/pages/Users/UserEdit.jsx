@@ -1,40 +1,43 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../../axiosConfig';
-import Loading from '../../components/Loading';
-import MemberList from '../../components/MemberList';
-import { useAuth } from '../../context/AuthContext';
+import UserForm from '../../components/UserForm';
 
-const Members = () => {
+import Loading from '../../components/Loading';
+import { useAuth } from '../../context/AuthContext';
+import { useParams } from 'react-router-dom';
+
+const Users = () => {
+  const { id } = useParams();
   const { user } = useAuth();
-  const [members, setMembers] = useState([]);
+  const [editingUser, setEditingUser] = useState(null);
   const [started, setStarted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchMembers = async () => {
+    const fetchUsers = async () => {
       try {
         setLoading(true);
         setStarted(true);
-        const response = await axiosInstance.get('/api/members', {
+        const response = await axiosInstance.get(`/api/users/${id}`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        setMembers(response.data);
+        setEditingUser(response.data);
         setLoading(false);
       } catch (error) {
-        alert('Failed to fetch Members.');
+        alert('Failed to fetch User.');
       }
     };
 
-    fetchMembers();
-  }, [user]);
+    fetchUsers();
+  }, [id, user]);
 
   return (
     <div className="container mx-auto p-6">
-      {!started && <Loading/>}
-      {started && loading && <Loading/>}
-      {started && !loading && <MemberList members={members} setMembers={setMembers} />}
+    {!started && <Loading/>}
+    {started && loading && <Loading/>}
+    {started && !loading && <UserForm editingUser={editingUser}/>}
     </div>
   );
 };
 
-export default Members;
+export default Users;

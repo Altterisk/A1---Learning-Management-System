@@ -18,12 +18,11 @@ describe('AddCourse Function Test', () => {
   it('should create a new course successfully', async () => {
     // Mock request data
     const req = {
-      user: { id: new mongoose.Types.ObjectId() },
       body: { title: "Divine Magic 101", description: "Basic Healing Spells", teacher: new mongoose.Types.ObjectId(), startDate: "2025-02-24", endDate: "2025-06-27" }
     };
 
     // Mock course that would be created
-    const createdCourse = { _id: new mongoose.Types.ObjectId(), ...req.body, userId: req.user.id };
+    const createdCourse = { _id: new mongoose.Types.ObjectId(), ...req.body };
 
     // Stub Course.create to return the createdCourse
     const createStub = sinon.stub(Course, 'create').resolves(createdCourse);
@@ -38,7 +37,7 @@ describe('AddCourse Function Test', () => {
     await addCourse(req, res);
 
     // Assertions
-    expect(createStub.calledOnceWith({ userId: req.user.id, ...req.body })).to.be.true;
+    expect(createStub.calledOnceWith({ ...req.body })).to.be.true;
     expect(res.status.calledWith(201)).to.be.true;
     expect(res.json.calledWith(createdCourse)).to.be.true;
 
@@ -158,14 +157,11 @@ describe('UpdateCourse Function Test', () => {
 
 describe('GetCourses Function Test', () => {
 
-  it('should return courses for the given user', async () => {
-    // Mock user ID
-    const userId = new mongoose.Types.ObjectId();
-
+  it('should return all courses', async () => {
     // Mock course data
     const courses = [
-      { _id: new mongoose.Types.ObjectId(), title: "Divine Magic 101", description: "Basic Healing Spells", userId, startDate: new Date("2025-02-24"), endDate: new Date("2025-06-27") },
-      { _id: new mongoose.Types.ObjectId(), title: "Elemental Magic 101", description: "Basic Fire and Ice Spells", userId, startDate: new Date("2025-02-24"), endDate: new Date("2025-06-27") }
+      { _id: new mongoose.Types.ObjectId(), title: "Divine Magic 101", description: "Basic Healing Spells", startDate: new Date("2025-02-24"), endDate: new Date("2025-06-27") },
+      { _id: new mongoose.Types.ObjectId(), title: "Elemental Magic 101", description: "Basic Fire and Ice Spells", startDate: new Date("2025-02-24"), endDate: new Date("2025-06-27") }
     ];
 
     // Stub Course.find to return mock courses
@@ -175,7 +171,7 @@ describe('GetCourses Function Test', () => {
     });
 
     // Mock request & response
-    const req = { user: { id: userId } };
+    const req = {}; // No need for user ID anymore
     const res = {
       json: sinon.spy(),
       status: sinon.stub().returnsThis()
@@ -185,7 +181,7 @@ describe('GetCourses Function Test', () => {
     await getCourses(req, res);
 
     // Assertions
-    expect(findStub.calledOnceWith({ userId })).to.be.true;
+    expect(findStub.calledOnce).to.be.true;
     expect(res.json.calledWith(courses)).to.be.true;
     expect(res.status.called).to.be.false; // No error status should be set
 
@@ -198,7 +194,7 @@ describe('GetCourses Function Test', () => {
     const findStub = sinon.stub(Course, 'find').throws(new Error('DB Error'));
 
     // Mock request & response
-    const req = { user: { id: new mongoose.Types.ObjectId() } };
+    const req = {};
     const res = {
       json: sinon.spy(),
       status: sinon.stub().returnsThis()

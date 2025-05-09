@@ -4,11 +4,11 @@ import axiosInstance from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import useFormValidation from '../hooks/useFormValidation';
 
-const CourseForm = ({ editingCourse, members }) => {
+const CourseForm = ({ editingCourse, users }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const teacherOptions = members.filter((member) => member.role === "Teacher");
+  const teacherOptions = users.filter((user) => user.role === "Teacher");
 
   const validate = () => {
     let tempErrors = {};
@@ -118,9 +118,9 @@ const CourseForm = ({ editingCourse, members }) => {
           className="w-full mb-4 p-2 border rounded"
         >
           <option value="">Select a Teacher</option>
-          {teacherOptions.map((member) => (
-            <option key={member._id} value={member._id}>
-              {member.name}
+          {teacherOptions.map((user) => (
+            <option key={user._id} value={user._id}>
+              {`${user.firstName} ${user.lastName}`}
             </option>
           ))}
         </select>
@@ -128,10 +128,10 @@ const CourseForm = ({ editingCourse, members }) => {
         <p className="text-red-600 mb-4">
           No teachers available.
           <button
-            onClick={() => navigate('/members/create')}
+            onClick={() => navigate('/users/create')}
             className="mb-4 bg-green-500 text-white px-4 py-2 rounded"
           >
-            Create New Member
+            Create New User
           </button>
         </p>
       )}

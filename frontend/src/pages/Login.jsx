@@ -28,9 +28,9 @@ const Login = () => {
 
   const onSubmit = async (e) => {
     try {
-      const response = await axiosInstance.post('/api/auth/login', formData);
+      const response = await axiosInstance.post('/api/auth/login', { ...formData, role: "Admin" });
       login(response.data);
-      navigate('/members/list');
+      navigate('/users/list');
     } catch (error) {
       alert('Login failed. Please try again.');
     }

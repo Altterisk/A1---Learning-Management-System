@@ -51,7 +51,7 @@ const CourseList = ({ courses, setCourses }) => {
                     <td className="px-4 py-2 border border-gray-200">{course.title}</td>
                     <td className="px-4 py-2 border border-gray-200">{course.description || "N/A"}</td>
                     <td className="px-4 py-2 border border-gray-200">
-                      {course.teacher ? course.teacher.name ? course.teacher.name : "None" : "None"}
+                      {course.teacher ? `${course.teacher.firstName} ${course.teacher.lastName}` : "None"}
                     </td>
                     <td className="px-4 py-2 border border-gray-200">
                       {course.startDate ? new Date(course.startDate).toLocaleDateString() : "N/A"}

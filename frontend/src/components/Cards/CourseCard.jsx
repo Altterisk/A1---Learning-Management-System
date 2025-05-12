@@ -23,6 +23,9 @@ const CourseCard = ({ course, onDelete }) => {
         <p className="text-sm text-gray-700 font-medium">
           <span className="font-semibold text-gray-900">End Date:</span> {course.endDate ? new Date(course.endDate).toLocaleDateString() : 'N/A'}
         </p>
+        <p className="text-sm text-gray-700 font-medium">
+          <span className="font-semibold text-gray-900">Number of Students:</span> {Array.isArray(course.students) ? course.students.length : 0}
+        </p>
       </div>
 
       {(isAdmin || isTeacherOfCourse) && (
@@ -34,12 +37,21 @@ const CourseCard = ({ course, onDelete }) => {
             Edit
           </button>
           {isAdmin && (
-            <button
-              onClick={() => onDelete(course._id)}
-              className="bg-red-500 text-white px-3 py-1 rounded font-semibold"
-            >
-              Delete
-            </button>
+            <>
+              <button
+                onClick={() => navigate(`/courses/assign/${course._id}`)}
+                className="bg-blue-500 text-white px-3 py-1 rounded font-semibold"
+              >
+                Assign
+              </button>
+              
+              <button
+                onClick={() => onDelete(course._id)}
+                className="bg-red-500 text-white px-3 py-1 rounded font-semibold"
+              >
+                Delete
+              </button>
+            </>
           )}
         </div>
       )}

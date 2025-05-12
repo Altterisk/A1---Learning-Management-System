@@ -11,7 +11,7 @@ router.route('/mycourses').get(protect, allowedRoles('Teacher', 'Student'), getM
 router.route('/').get(protect, getCourses).post(protect, allowedRoles('Admin'), addCourse);
 router.route('/:id').get(protect, getCourse).put(protect, allowedRoles('Admin', 'Teacher'), updateCourse).delete(protect, allowedRoles('Admin'), deleteCourse);
 
-router.route('/:id/register').post(protect, registerToCourse);
-router.route('/:id/register').delete(protect, unregisterFromCourse);
+router.route('/:id/register').post(protect, allowedRoles('Admin'), registerToCourse);
+router.route('/:id/register').delete(protect, allowedRoles('Admin'), unregisterFromCourse);
 
 module.exports = router;

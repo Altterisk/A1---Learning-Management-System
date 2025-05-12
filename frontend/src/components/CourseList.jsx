@@ -23,12 +23,18 @@ const CourseList = ({ courses, setCourses }) => {
   return (
     <div>
       <div className="flex justify-end">
-        <button
+         <button
           onClick={() => navigate('/courses/create')}
-          className="mb-4 bg-green-500 text-white px-4 py-2 rounded"
+          className="mb-4 mx-3 bg-green-500 text-white px-4 py-2 rounded"
         >
           Create New Course
-        </button>
+        </button>  
+          <button
+          onClick={() => navigate('/courses/create-package')}
+          className="mb-4 mx-3 bg-green-500 text-white px-4 py-2 rounded"
+        >
+         New Course Package
+        </button> 
       </div>
       {courses.length === 0 ? (
         <p className="text-gray-500">No courses found. Click "Create New Course" to add one.</p>

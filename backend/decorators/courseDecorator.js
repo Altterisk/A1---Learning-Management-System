@@ -32,11 +32,4 @@ class CoursePackageDecorator extends Course {
   }
 }
 
-// This decorator will apply a discount to a course
-class DiscountDecorator extends CoursePackageDecorator {
-  constructor(course, packageDetails) {
-    super(course, packageDetails);
-  }
-}
-
 module.exports = { Course, CoursePackageDecorator };

@@ -8,6 +8,7 @@ import UserCreate from './pages/Users/UserCreate';
 import CourseList from './pages/Courses/CourseList';
 import CourseEdit from './pages/Courses/CourseEdit';
 import CourseCreate from './pages/Courses/CourseCreate';
+import CourseCreatePackage from './pages/Courses/CourseCreatePackage';
 import NotFound from './pages/NotFound';
 import Home from './pages/Home'
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -30,6 +31,7 @@ function App() {
         <Route path="/courses/list" element={<ProtectedRoute element={<CourseList />} />} />
         <Route path="/courses/edit/:id" element={<ProtectedRoute element={<CourseEdit />} />} />
         <Route path="/courses/create" element={<ProtectedRoute element={<CourseCreate />} />} />
+        <Route path="/courses/create-package"  element={<ProtectedRoute element={<CourseCreatePackage />} />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

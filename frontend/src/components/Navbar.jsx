@@ -11,28 +11,28 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white p-4 flex justify-between items-center">
-      <Link to="/" className="text-2xl font-bold">Learning Management System</Link>
+    <nav className="bg-gray-900 text-gray-300 p-4 flex justify-between items-center">
+      <Link to="/" className="text-2xl hover:underline text-orange-500 font-bold">Learning Management System</Link>
       <div>
         {loading ? null :
           user ? (
             <>
-              <Link to="/users/list" className="mr-4">Users</Link>
-              <Link to="/courses/list" className="mr-4">Courses</Link>
-              <Link to="/profile" className="mr-4">Profile</Link>
+              <Link to="/users/list" className="hover:text-white hover:underline font-bold mr-4">Users</Link>
+              <Link to="/courses/list" className="hover:text-white hover:underline font-bold mr-4">Courses</Link>
+              <Link to="/profile" className="hover:text-white hover:underline font-bold mr-4">Profile</Link>
               <button
                 onClick={handleLogout}
-                className="bg-red-500 px-4 py-2 rounded hover:bg-red-700"
+                className="bg-red-500 hover:text-white font-bold px-4 py-2 rounded hover:bg-red-700"
               >
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="mr-4">Login</Link>
+              <Link to="/login" className="hover:text-white hover:underline font-bold mr-4">Login</Link>
               <Link
                 to="/register"
-                className="bg-green-500 px-4 py-2 rounded hover:bg-green-700"
+                className="bg-green-500 hover:text-white font-bold px-4 py-2 rounded hover:bg-green-700"
               >
                 Register
               </Link>

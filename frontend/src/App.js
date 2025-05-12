@@ -8,33 +8,60 @@ import UserCreate from './pages/Users/UserCreate';
 import CourseList from './pages/Courses/CourseList';
 import CourseEdit from './pages/Courses/CourseEdit';
 import CourseCreate from './pages/Courses/CourseCreate';
-import CourseCreatePackage from './pages/Courses/CourseCreatePackage';
 import NotFound from './pages/NotFound';
 import Home from './pages/Home'
 import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from './pages/Profile';
 import ChangePassword from './pages/ChangePassword';
+import FullPageWrapper from './components/FullPageWrapper';
+import Footer from './components/Footer';
 
 function App() {
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
-        <Route path="/changePassword" element={<ProtectedRoute element={<ChangePassword />} />} />
-        <Route path="/users/list" element={<ProtectedRoute element={<UserList />} />} />
-        <Route path="/users/edit/:id" element={<ProtectedRoute element={<UserEdit />} />} />
-        <Route path="/users/create" element={<ProtectedRoute element={<UserCreate />} />} />
-        <Route path="/courses/list" element={<ProtectedRoute element={<CourseList />} />} />
-        <Route path="/courses/edit/:id" element={<ProtectedRoute element={<CourseEdit />} />} />
-        <Route path="/courses/create" element={<ProtectedRoute element={<CourseCreate />} />} />
-        <Route path="/courses/create-package"  element={<ProtectedRoute element={<CourseCreatePackage />} />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+    <div className="min-h-screen flex flex-col bg-gray-100">
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={
+              <FullPageWrapper><Home /></FullPageWrapper>
+            } />
+            <Route path="/login" element={
+              <FullPageWrapper full><Login /></FullPageWrapper>
+            } />
+            <Route path="/register" element={
+              <FullPageWrapper full><Register /></FullPageWrapper>
+            } />
+            <Route path="/profile" element={
+              <FullPageWrapper><ProtectedRoute element={<Profile />} /></FullPageWrapper>
+            } />
+            <Route path="/changePassword" element={
+              <FullPageWrapper><ProtectedRoute element={<ChangePassword />} /></FullPageWrapper>
+            } />
+            <Route path="/users/list" element={
+              <FullPageWrapper><ProtectedRoute element={<UserList />} /></FullPageWrapper>
+            } />
+            <Route path="/users/edit/:id" element={
+              <FullPageWrapper><ProtectedRoute element={<UserEdit />} /></FullPageWrapper>
+            } />
+            <Route path="/users/create" element={
+              <FullPageWrapper><ProtectedRoute element={<UserCreate />} /></FullPageWrapper>
+            } />
+            <Route path="/courses/list" element={
+              <FullPageWrapper><ProtectedRoute element={<CourseList />} /></FullPageWrapper>
+            } />
+            <Route path="/courses/edit/:id" element={
+              <FullPageWrapper><ProtectedRoute element={<CourseEdit />} /></FullPageWrapper>
+            } />
+            <Route path="/courses/create" element={
+              <FullPageWrapper><ProtectedRoute element={<CourseCreate />} /></FullPageWrapper>
+            } />
+            <Route path="*" element={
+              <FullPageWrapper full><NotFound /></FullPageWrapper>
+            } />
+        </Routes>
+        <Footer/>
+      </Router>
+    </div>
   );
 }
 

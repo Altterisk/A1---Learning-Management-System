@@ -15,6 +15,7 @@ import Profile from './pages/Profile';
 import ChangePassword from './pages/ChangePassword';
 import FullPageWrapper from './components/FullPageWrapper';
 import Footer from './components/Footer';
+import AssignStudentsPage from './pages/Courses/AssignStudentPage';
 
 function App() {
   return (
@@ -51,6 +52,9 @@ function App() {
             } />
             <Route path="/courses/edit/:id" element={
               <FullPageWrapper><ProtectedRoute element={<CourseEdit />} /></FullPageWrapper>
+            } />
+            <Route path="/courses/assign/:id" element={
+              <FullPageWrapper><ProtectedRoute element={<AssignStudentsPage />} /></FullPageWrapper>
             } />
             <Route path="/courses/create" element={
               <FullPageWrapper><ProtectedRoute element={<CourseCreate />} /></FullPageWrapper>

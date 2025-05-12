@@ -2,6 +2,7 @@ import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import UserCard from './Cards/UserCard';
 
 const UserList = ({ users, setUsers }) => {
   const { user } = useAuth();
@@ -30,14 +31,16 @@ const UserList = ({ users, setUsers }) => {
 
   return (
     <div>
-      <div className="flex justify-end">
-        <button
-          onClick={() => navigate('/users/create')}
-          className="mb-4 bg-green-500 text-white px-4 py-2 rounded"
-        >
-          Create New User
-        </button>
-      </div>
+      {(user.role === 'Admin') && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => navigate('/users/create')}
+            className="mb-4 bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Create New User
+          </button>
+        </div>
+      )}
       {users.length === 0 ? (
         <p className="text-gray-500">No users found. Click "Create New User" to add one.</p>
       ) : (
@@ -75,41 +78,11 @@ const UserList = ({ users, setUsers }) => {
               Students
             </label>
           </div>
-          <table className="min-w-full bg-white border border-gray-200">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 border border-gray-200">Name</th>
-                <th className="px-4 py-2 border border-gray-200">Role</th>
-                <th className="px-4 py-2 border border-gray-200">Date of Birth</th>
-                <th className="px-4 py-2 border border-gray-200">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user) => (
-                <tr key={user._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 border border-gray-200">{`${user.firstName} ${user.lastName}`} </td>
-                  <td className="px-4 py-2 border border-gray-200">{user.role}</td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    {user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "N/A"}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    <button
-                      onClick={() => navigate(`/users/edit/${user._id}`)}
-                      className="mr-2 bg-yellow-500 text-white px-3 py-1 rounded"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(user._id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {filteredUsers.map((u) => (
+              <UserCard key={u._id} user={u} onDelete={handleDelete} />
+            ))}
+          </div>
         </div>
       )}
     </div>

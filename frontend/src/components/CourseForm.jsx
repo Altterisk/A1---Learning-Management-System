@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,19 @@ import useFormValidation from '../hooks/useFormValidation';
 const CourseForm = ({ editingCourse, users }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [isRedirecting, setIsRedirecting] = useState(true);
+
+  // Redirect to home if the user is not Admin or Teacher
+  useEffect(() => {
+    if (user.role !== 'Admin' && user.role !== 'Teacher') {
+      navigate('/');
+    }
+    else if (editingCourse && user.role === 'Teacher' && user.id !== editingCourse.teacher?._id) {
+      navigate('/');
+    } else {
+      setIsRedirecting(false);
+    }
+  }, [user, editingCourse, navigate]);
 
   const teacherOptions = users.filter((user) => user.role === "Teacher");
 
@@ -21,14 +34,17 @@ const CourseForm = ({ editingCourse, users }) => {
 
     return tempErrors;
   };
-  
-  const { formData, errors, handleChange, handleBlur, handleSubmit, setFormData } = useFormValidation({
-    title: '',
-    description: '',
-    teacher: '',
-    startDate: '',
-    endDate: ''
-  }, validate);
+
+  const { formData, errors, handleChange, handleBlur, handleSubmit, setFormData } = useFormValidation(
+    {
+      title: '',
+      description: '',
+      teacher: '',
+      startDate: '',
+      endDate: '',
+    },
+    validate
+  );
 
   useEffect(() => {
     if (editingCourse) {
@@ -43,21 +59,29 @@ const CourseForm = ({ editingCourse, users }) => {
       setFormData({
         title: "",
         description: "",
-        teacher: "",
+        teacher: user.role === 'Teacher' ? user.id : "",
         startDate: "",
         endDate: "",
       });
     }
-  }, [editingCourse, setFormData]);
+  }, [editingCourse, setFormData, user]);
 
   const onSubmit = async (e) => {
     try {
       if (editingCourse) {
+        if (user.role === 'Teacher') {
+          formData.teacher = user.id;
+        }
+
         await axiosInstance.put(`/api/courses/${editingCourse._id}`, formData, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         alert('Course updated successfully!');
       } else {
+        if (user.role === 'Teacher') {
+          formData.teacher = user.id;
+        }
+
         await axiosInstance.post('/api/courses', formData, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
@@ -69,6 +93,10 @@ const CourseForm = ({ editingCourse, users }) => {
       alert(error);
     }
   };
+
+  if (isRedirecting) {
+    return null;
+  }
 
   return (
     <form onSubmit={(e) => handleSubmit(e, onSubmit)} className="bg-white p-6 shadow-md rounded mb-6">
@@ -116,6 +144,7 @@ const CourseForm = ({ editingCourse, users }) => {
           onBlur={handleBlur}
           name="teacher"
           className="w-full mb-4 p-2 border rounded"
+          disabled={user.role === 'Teacher'} // Disable if the user is a Teacher (fixed to their own id)
         >
           <option value="">Select a Teacher</option>
           {teacherOptions.map((user) => (
@@ -165,9 +194,12 @@ const CourseForm = ({ editingCourse, users }) => {
       />
       {errors.endDate && <p className="text-red-600 mb-2">{errors.endDate}</p>}
 
-      <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
-        {editingCourse ? "Update Course" : "Create Course"}
-      </button>
+
+      <div className="mt-6 flex justify-end">
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded font-semibold">
+          {editingCourse ? "Update Course" : "Create Course"}
+        </button>
+      </div>
     </form>
   );
 };

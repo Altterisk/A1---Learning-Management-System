@@ -1,4 +1,7 @@
 const Course = require("../models/Course");
+const User = require("../models/User");
+const CourseNotifier = require("../observers/CourseNotifier");
+const Subscriber = require("../observers/Subscriber");
 
 const getCourses = async (req, res) => {
   try {
@@ -30,13 +33,25 @@ const getCourse = async (req, res) => {
 const addCourse = async (req, res) => {
   const { title, description, teacher, startDate, endDate } = req.body;
   try {
+    let teacherDoc = null;
+    if (teacher) {
+      teacherDoc = await User.findOne({ _id: teacher, role: 'Teacher' });
+      if (!teacherDoc) {
+        return res.status(400).json({ message: "Assigned teacher must be a valid Teacher." });
+      }
+    }
     const course = await Course.create({
       title,
       description,
-      teacher,
+      teacher: teacherDoc ? teacherDoc._id : null,
       startDate,
       endDate,
     });
+
+    const notifier = new CourseNotifier();
+    notifier.subscribe(new Subscriber(teacherDoc._id));
+    await notifier.notify(`You have been assigned to "${course.title}".`);
+
     res.status(201).json(course);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -59,11 +74,28 @@ const updateCourse = async (req, res) => {
     ) {
       return res.status(403).json({ message: "You are not authorized to update this course." });
     }
+    console.log(teacher)
+    let teacherDoc = null;
+    if (teacher) {
+      teacherDoc = await User.findOne({ _id: teacher, role: 'Teacher' });
+      if (!teacherDoc) {
+        return res.status(400).json({ message: "Assigned teacher must be a valid Teacher." });
+      }
+    }
+    console.log(teacherDoc)
 
     course.title = title || course.title;
     course.description = description || course.description;
     if (teacher !== undefined) {
-      course.teacher = teacher || null;
+      if (teacher) {
+        const newTeacher = await User.findOne({ _id: teacher, role: 'Teacher' });
+        if (!newTeacher) {
+          return res.status(400).json({ message: 'Assigned teacher must be a valid Teacher.' });
+        }
+        course.teacher = newTeacher._id;
+      } else {
+        course.teacher = null;
+      }
     }
     if (startDate === '') {
       course.startDate = null;
@@ -78,6 +110,14 @@ const updateCourse = async (req, res) => {
     }
 
     const updatedCourse = await course.save();
+
+    const notifier = new CourseNotifier();
+    notifier.subscribe(new Subscriber(teacherDoc._id));
+    for (const student of course.students) {
+      notifier.subscribe(new Subscriber(student._id));
+    }
+    await notifier.notify(`Teacher ${teacherDoc.firstName} ${teacherDoc.lastName}  have been assigned to "${course.title}".`);
+
     res.json(updatedCourse);
   } catch (error) {
     res.status(500).json({ message: error.message });

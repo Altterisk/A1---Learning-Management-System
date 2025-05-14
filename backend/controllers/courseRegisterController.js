@@ -1,5 +1,7 @@
 const Course = require("../models/Course");
 const User = require("../models/User");
+const CourseNotifier = require("../observers/CourseNotifier");
+const Subscriber = require("../observers/Subscriber");
 
 const registerToCourse = async (req, res) => {
   const courseId = req.params.id;
@@ -17,6 +19,13 @@ const registerToCourse = async (req, res) => {
     if (course.students.includes(studentId)) {
       return res.status(400).json({ message: "Already registered" });
     }
+
+    const notifier = new CourseNotifier();
+    notifier.subscribe(new Subscriber(student._id));
+    if (course.teacher) {
+      notifier.subscribe(new Subscriber(course.teacher._id));
+    }
+    await notifier.notify(`${student.firstName} ${student.lastName} has been assigned to "${course.title}".`);
 
     course.students.push(studentId);
     await course.save();
@@ -38,6 +47,13 @@ const unregisterFromCourse = async (req, res) => {
 
     const course = await Course.findById(courseId);
     if (!course) return res.status(404).json({ message: "Course not found" });
+    
+    const notifier = new CourseNotifier();
+    notifier.subscribe(new Subscriber(student._id));
+    if (course.teacher) {
+      notifier.subscribe(new Subscriber(course.teacher._id));
+    }
+    await notifier.notify(`${student.firstName} ${student.lastName} has been unassigned from "${course.title}".`);
 
     course.students = course.students.filter(
       (id) => id.toString() !== studentId

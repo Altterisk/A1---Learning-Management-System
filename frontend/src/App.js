@@ -17,6 +17,7 @@ import FullPageWrapper from './components/FullPageWrapper';
 import Footer from './components/Footer';
 import AssignStudentsPage from './pages/Courses/AssignStudentPage';
 import CourseCreatePackage from './pages/Courses/CourseCreatePackage';
+import NotificationList from './pages/NotificationList';
 
 function App() {
   return (
@@ -62,6 +63,9 @@ function App() {
             } />
             <Route path="/courses/create-package" element={
               <FullPageWrapper><ProtectedRoute element={<CourseCreatePackage />} /></FullPageWrapper>
+            } />
+            <Route path="/notifications" element={
+              <FullPageWrapper><ProtectedRoute element={<NotificationList />} /></FullPageWrapper>
             } />
             <Route path="*" element={
               <FullPageWrapper full><NotFound /></FullPageWrapper>

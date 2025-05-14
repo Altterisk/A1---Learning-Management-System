@@ -105,14 +105,21 @@ const changePassword = async (req, res) => {
 const getUsers = async (req, res) => {
     try {
         const roleContext = new RoleStrategyContext(req.user);
-        const filter = roleContext.getFilter();
+        const baseFilter = roleContext.getFilter();
 
-        const users = await User.find(filter);
+        const { role } = req.query;
+    
+        let finalFilter = baseFilter;
+    
+        if (role) {
+            finalFilter = { $and: [baseFilter, { role }] };
+        }
+        const users = await User.find(finalFilter);
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};
+  };
 
 const getUser = async (req, res) => {
     try {

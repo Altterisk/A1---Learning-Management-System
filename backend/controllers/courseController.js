@@ -46,8 +46,19 @@ const addCourse = async (req, res) => {
 const updateCourse = async (req, res) => {
   const { title, description, teacher, startDate, endDate } = req.body;
   try {
-    const course = await Course.findById(req.params.id);
+    const course = await Course.findById(req.params.id).populate({
+      path: "teacher",
+      select: "_id role",
+      match: { role: "Teacher" },
+    });
     if (!course) return res.status(404).json({ message: "Course not found" });
+
+    if (
+      req.user.role !== 'Admin' &&
+      !(req.user.role === 'Teacher' && course.teacher && course.teacher._id.toString() === req.user.id)
+    ) {
+      return res.status(403).json({ message: "You are not authorized to update this course." });
+    }
 
     course.title = title || course.title;
     course.description = description || course.description;

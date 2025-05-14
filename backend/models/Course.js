@@ -6,6 +6,7 @@ const courseSchema = new mongoose.Schema({
   teacher: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false, default: null},
   startDate: { type: Date },
   endDate: { type: Date },
+  students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 });
 
 module.exports = mongoose.model("Course", courseSchema);

@@ -47,8 +47,12 @@ export const AuthProvider = ({ children }) => {
     setUser({ ...userData, token: existingToken });
   };
 
+  const resetNotificationCount = () => {
+    setUser({ ...user, unreadCount: 0 });
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateData }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateData, resetNotificationCount }}>
       {children}
     </AuthContext.Provider>
   );

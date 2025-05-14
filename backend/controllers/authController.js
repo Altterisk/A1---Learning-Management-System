@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const RoleStrategyContext = require('../strategies/userFilterStartegy');
+const Notification = require('../models/Notification');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
@@ -45,6 +46,10 @@ const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ message: 'User not found' });
+        const unreadCount = await Notification.countDocuments({
+            user: req.user.id,
+            read: false,
+        });
 
         res.status(200).json({
             id: user.id,
@@ -53,8 +58,31 @@ const getProfile = async (req, res) => {
             email: user.email,
             role: user.role, 
             dateOfBirth: user.dateOfBirth,
+            unreadCount: unreadCount,
             token: generateToken(user.id),
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getNotifications = async (req, res) => {
+    try {
+        const notifications = await Notification.find({ user: req.user.id })
+            .sort({ createdAt: -1 });
+        res.status(200).json(notifications);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const markAllNotificationsRead = async (req, res) => {
+    try {
+        await Notification.updateMany(
+            { user: req.user.id, read: false },
+            { $set: { read: true } }
+        );
+        res.status(200).json({ message: 'All notifications marked as read' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -119,7 +147,7 @@ const getUsers = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-  };
+};
 
 const getUser = async (req, res) => {
     try {
@@ -204,4 +232,6 @@ module.exports = {
     addUser,
     updateUser,
     deleteUser,
+    getNotifications,
+    markAllNotificationsRead
 };

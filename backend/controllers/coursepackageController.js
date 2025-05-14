@@ -4,7 +4,7 @@ const CoursePackage = require('../models/CoursePackage');
 const { CoursePackageDecorator } = require('../decorators/courseDecorator');
 
 // Create a new course package
-exports.createCoursePackage = async (req, res) => {
+const createCoursePackage = async (req, res) => {
   try {
     const { name, description, courses } = req.body;
 
@@ -50,4 +50,19 @@ exports.createCoursePackage = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+// Controller to fetch all course packages
+const getCoursePackages = async (req, res) => {
+  try {
+    const coursepackages = await CoursePackage.find(); // Fetch data from MongoDB
+    res.status(200).json(coursepackages);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching course package', error: error.message });
+  }
+};
+
+module.exports = {
+  createCoursePackage,
+  getCoursePackages,
 };

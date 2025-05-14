@@ -194,7 +194,7 @@ describe('GetUsers Function Test', () => {
     const findStub = sinon.stub(User, 'find').resolves(users);
 
     // Mock request & response
-    const req = { user: { id: new mongoose.Types.ObjectId(), role: 'Admin' } };
+    const req = { user: { id: new mongoose.Types.ObjectId(), role: 'Admin' }, query: {} };
     const res = {
       json: sinon.spy(),
       status: sinon.stub().returnsThis()
@@ -217,7 +217,7 @@ describe('GetUsers Function Test', () => {
     const findStub = sinon.stub(User, 'find').throws(new Error('DB Error'));
 
     // Mock request & response
-    const req = { user: { id: new mongoose.Types.ObjectId(), role: 'Admin' } };
+    const req = { user: { id: new mongoose.Types.ObjectId(), role: 'Admin' }, query: {} };
     const res = {
       json: sinon.spy(),
       status: sinon.stub().returnsThis()

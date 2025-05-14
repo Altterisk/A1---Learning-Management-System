@@ -74,7 +74,6 @@ const updateCourse = async (req, res) => {
     ) {
       return res.status(403).json({ message: "You are not authorized to update this course." });
     }
-    console.log(teacher)
     let teacherDoc = null;
     if (teacher) {
       teacherDoc = await User.findOne({ _id: teacher, role: 'Teacher' });
@@ -82,17 +81,14 @@ const updateCourse = async (req, res) => {
         return res.status(400).json({ message: "Assigned teacher must be a valid Teacher." });
       }
     }
-    console.log(teacherDoc)
-
     course.title = title || course.title;
     course.description = description || course.description;
     if (teacher !== undefined) {
       if (teacher) {
-        const newTeacher = await User.findOne({ _id: teacher, role: 'Teacher' });
-        if (!newTeacher) {
+        if (!teacherDoc) {
           return res.status(400).json({ message: 'Assigned teacher must be a valid Teacher.' });
         }
-        course.teacher = newTeacher._id;
+        course.teacher = teacherDoc._id;
       } else {
         course.teacher = null;
       }
@@ -113,7 +109,7 @@ const updateCourse = async (req, res) => {
 
     const notifier = new CourseNotifier();
     notifier.subscribe(new Subscriber(teacherDoc._id));
-    for (const student of course.students) {
+    for (const student of (course.students || [])) {
       notifier.subscribe(new Subscriber(student._id));
     }
     await notifier.notify(`Teacher ${teacherDoc.firstName} ${teacherDoc.lastName}  have been assigned to "${course.title}".`);

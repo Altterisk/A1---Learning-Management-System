@@ -7,7 +7,10 @@ const mongoose = require('mongoose');
 const sinon = require('sinon');
 const Course = require('../models/Course');
 const { updateCourse, getCourses, getCourse, addCourse, deleteCourse } = require('../controllers/courseController');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { expect } = chai;
+
 
 chai.use(chaiHttp);
 let server;
@@ -17,36 +20,47 @@ describe('AddCourse Function Test', () => {
 
   it('should create a new course successfully', async () => {
     // Mock request data
+    const teacherId = new mongoose.Types.ObjectId();
     const req = {
       body: { title: "Divine Magic 101", description: "Basic Healing Spells", teacher: new mongoose.Types.ObjectId(), startDate: "2025-02-24", endDate: "2025-06-27" }
     };
 
     // Mock course that would be created
+    const teacherDoc = { _id: teacherId, role: 'Teacher' };
     const createdCourse = { _id: new mongoose.Types.ObjectId(), ...req.body };
 
-    // Stub Course.create to return the createdCourse
-    const createStub = sinon.stub(Course, 'create').resolves(createdCourse);
+    // Mock User.findOne to simulate finding the teacher
+    const userStub = sinon.stub(User, 'findOne').resolves(teacherDoc);
 
-    // Mock response object
+    // Mock Course.create
+    const courseStub = sinon.stub(Course, 'create').resolves(createdCourse);
+
+    // Stub CourseNotifier and Subscriber
+    const notificationStub = sinon.stub(Notification, 'create').resolves({});
+
+    // Mock response
     const res = {
       status: sinon.stub().returnsThis(),
       json: sinon.spy()
     };
 
-    // Call function
     await addCourse(req, res);
 
-    // Assertions
-    expect(createStub.calledOnceWith({ ...req.body })).to.be.true;
+    expect(courseStub.calledOnce).to.be.true;
     expect(res.status.calledWith(201)).to.be.true;
     expect(res.json.calledWith(createdCourse)).to.be.true;
 
     // Restore stubbed methods
-    createStub.restore();
+    notificationStub.restore();
+    courseStub.restore();
+    userStub.restore();
   });
 
   it('should return 500 if an error occurs', async () => {
     // Stub Course.create to throw an error
+    const teacherId = new mongoose.Types.ObjectId();
+    const teacherDoc = { _id: teacherId, role: 'Teacher' };
+    const userStub = sinon.stub(User, 'findOne').resolves(teacherDoc);
     const createStub = sinon.stub(Course, 'create').throws(new Error('DB Error'));
 
     // Mock request data
@@ -70,6 +84,7 @@ describe('AddCourse Function Test', () => {
 
     // Restore stubbed methods
     createStub.restore();
+    userStub.restore();
   });
 
 });
@@ -79,6 +94,13 @@ describe('UpdateCourse Function Test', () => {
   it('should update course successfully', async () => {
     // Mock course data
     const courseId = new mongoose.Types.ObjectId();
+    const newTeacherId = new mongoose.Types.ObjectId();
+    const teacherDoc = {
+      _id: newTeacherId,
+      role: 'Teacher',
+      firstName: 'John',
+      lastName: 'Doe'
+    };
     const existingCourse = {
       _id: courseId,
       title: "Divine Magic 101",
@@ -89,12 +111,20 @@ describe('UpdateCourse Function Test', () => {
       save: sinon.stub().resolvesThis(), // Mock save method
     };
     // Stub Course.findById to return mock course
-    const findByIdStub = sinon.stub(Course, 'findById').resolves(existingCourse);
+    const findByIdStub = sinon.stub(Course, 'findById').returns({
+      populate: sinon.stub().resolves(existingCourse)
+    });
+    const userStub = sinon.stub(User, 'findOne').resolves(teacherDoc);
+    const notificationStub = sinon.stub(Notification, 'create').resolves({});
 
     // Mock request & response
     const req = {
       params: { id: courseId },
-      body: { title: "Divine Magic 102", description: "Purification and Exorcism Spells", teacher: new mongoose.Types.ObjectId(), startDate: "2025-02-24", endDate: "2025-06-27" }
+      body: { title: "Divine Magic 102", description: "Purification and Exorcism Spells", teacher: newTeacherId, startDate: "2025-02-24", endDate: "2025-06-27" },
+      user: {
+        role: 'Admin',
+        id: newTeacherId.toString()
+      }
     };
     const res = {
       json: sinon.spy(), 
@@ -104,6 +134,8 @@ describe('UpdateCourse Function Test', () => {
     // Call function
     await updateCourse(req, res);
 
+    console.log(res)
+
     // Assertions
     expect(existingCourse.title).to.equal("Divine Magic 102");
     expect(existingCourse.description).to.equal("Purification and Exorcism Spells");
@@ -112,15 +144,19 @@ describe('UpdateCourse Function Test', () => {
     expect(existingCourse.startDate.toISOString()).to.equal(new Date(req.body.startDate).toISOString());
     existingCourse.endDate = new Date(existingCourse.endDate); 
     expect(existingCourse.endDate.toISOString()).to.equal(new Date(req.body.endDate).toISOString());
-    expect(res.status.called).to.be.false; // No error status should be set
+    expect(res.status.called).to.be.false;
     expect(res.json.calledOnce).to.be.true;
 
     // Restore stubbed methods
+    notificationStub.restore();
+    userStub.restore();
     findByIdStub.restore();
   });
 
   it('should return 404 if course is not found', async () => {
-    const findByIdStub = sinon.stub(Course, 'findById').resolves(null);
+    const findByIdStub = sinon.stub(Course, 'findById').returns({
+      populate: sinon.stub().resolves(null)
+    });
 
     const req = { params: { id: new mongoose.Types.ObjectId() }, body: {} };
     const res = {

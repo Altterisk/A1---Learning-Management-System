@@ -22,14 +22,15 @@ const CourseList = ({ courses, setCourses }) => {
 
   return (
     <div>
-      {(user.role === 'Admin' || user.role === 'Teacher') && (
+     
         <div className="flex justify-between">
+           {(user.role === 'Admin') && (
           <button
             onClick={() => navigate('/courses/create')}
             className="mb-4 mx-2 bg-green-500 text-white px-4 py-2 rounded"
           >
             Create New Course
-          </button>
+          </button> )}
           <button
             onClick={() => navigate('/courses/list-package')}
             className="mb-4 mx-2  bg-green-500 text-white px-4 py-2 rounded"
@@ -37,7 +38,7 @@ const CourseList = ({ courses, setCourses }) => {
             View Course Packages
           </button>
         </div>
-      )}
+     
 
       
       {courses.length === 0 ? (

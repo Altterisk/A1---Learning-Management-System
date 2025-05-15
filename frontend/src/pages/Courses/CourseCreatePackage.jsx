@@ -26,7 +26,7 @@ useEffect(() => {
         alert('Failed to fetch User.');
       }
     };
-
+    
     fetchUsers();
   }, [id, user]);
 
@@ -34,7 +34,7 @@ useEffect(() => {
     <div className="container mx-auto p-6">
     {!started && <Loading/>}
     {started && loading && <Loading/>}
-    {started && !loading && <CoursePackageForm  editingCoursePackage={false} users={users}/>}
+    {started && !loading && <CoursePackageForm  users={users}/>}
     </div>
   );
 };

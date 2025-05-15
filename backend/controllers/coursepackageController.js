@@ -6,10 +6,10 @@ const { CoursePackageDecorator } = require('../decorators/courseDecorator');
 // Create a new course package
 const createCoursePackage = async (req, res) => {
   try {
-    const { name, description, courses } = req.body;
+    const { name, description, included_courses } = req.body;
 
     // Fetch course details from the database using the course IDs
-    const courseData = await Course.find({ '_id': { $in: courses } });
+    const courseData = await Course.find({ '_id': { $in: included_courses } });
 
     if (!courseData.length) {
       return res.status(400).json({ message: 'No valid courses found for the package.' });
@@ -31,7 +31,7 @@ const createCoursePackage = async (req, res) => {
     const coursePackage = new CoursePackage({
       name,
       description,
-      courses: courseData.map((course) => course._id),  // Save course IDs in the package
+      included_courses: courseData.map((course) => course._id),  // Save course IDs in the package
     });
 
     await coursePackage.save();
@@ -55,8 +55,8 @@ const createCoursePackage = async (req, res) => {
 // Controller to fetch all course packages
 const getCoursePackages = async (req, res) => {
   try {
-    const coursepackages = await CoursePackage.find(); // Fetch data from MongoDB
-    res.status(200).json(coursepackages);
+    const packages = await CoursePackage.find().populate('included_courses');
+    res.status(200).json(packages);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching course package', error: error.message });
   }

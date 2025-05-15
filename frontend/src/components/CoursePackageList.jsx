@@ -9,20 +9,16 @@ const { user } = useAuth();
 useEffect(() => {
     const fetchCourses = async () => {
       try {
-        //setLoading(true);
-        //setStarted(true);
         const response = await axiosInstance.get('/api/courses', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setCourses(response.data);
-        //setLoading(false);
       } catch (error) {
         alert('Failed to fetch Courses.');
       }
     };
     fetchCourses();
 }, [user]);
-
 
 return (
     <div>

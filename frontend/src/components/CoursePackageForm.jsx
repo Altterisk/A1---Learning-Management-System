@@ -5,8 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import CoursePackageList from './CoursePackageList';
 import useFormValidation from '../hooks/useFormValidation';
 
-const CoursePackageForm = ({ editingCoursePackage }) => {
-
+const CoursePackageForm = ({ users }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedCourses, setSelectedCourses] = useState([]);
@@ -45,12 +44,12 @@ const { formData, errors } = useFormValidation({
         await axiosInstance.post('/api/course-packages', {
         name: packageName,
         description: packageDescription,
-        courses: selectedCourses.map((course) => course._id), 
+        included_courses: selectedCourses.map((course) => course._id), 
         }, { 
         headers: { Authorization: `Bearer ${user.token}` }, 
       });
       alert('Package created successfully!');
-      navigate('/courses/list');
+      navigate('/courses/list-package');
     } catch (error) {
       console.error('Error creating package', error);
     }
@@ -59,7 +58,7 @@ const { formData, errors } = useFormValidation({
   return (
     <div> 
 
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded mb-6">
     <h1 className="text-2xl font-bold mb-4">Create Course Package </h1>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
         Package Name
@@ -87,7 +86,6 @@ const { formData, errors } = useFormValidation({
         className="w-full mb-4 p-2 border rounded"
         required
         />
-
      
       {errors.description && <p className="text-red-600 mb-2">{errors.description}</p>}
         <CoursePackageList onSelectCourse={handleSelectCourse} />

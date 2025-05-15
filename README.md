@@ -8,7 +8,7 @@
  * Admin: The main user of the system who can add users such as Faculty (teachers) and Students. 
  They are also in charge of creating courses and course packages. 
 
- * Faculty: The Faculty (teacher/instructor) can see the courses that were assigned to them as well as the students who are enrolled. They can also update the course information.
+ * Faculty: The Faculty (teacher/instructor) can see the courses that were assigned to them as well as the students who are enrolled. They can also update the course information. Once a course is assigned to the faculty, they will receive a notification in the dashboard.
 
  * Student: Upon confirmation of  enrolment, an account is created for them by the admin. They can use the system to see the course information.
 
@@ -23,4 +23,15 @@
 * Delete Courses
 * Course Assignment Notification
 * User Listing with Filter
-* Course Package Creation
+* Course Package
+
+**Device and Browser Compatibility**
+
+Users need to have stable internet connection to access the system. It can be accessed using a laptop, tablet or mobile however for optimal experience laptop is preferred. The operating system of the device can be Windows, macOS, Linux 
+
+The browser used should have JavaScript enabled and supports HTML5. 
+The list below are the browsers that supports modern JavaScript and HTML5: 
+* Google Chrome (latest versions) 
+* Mozilla Firefox 
+* Microsoft Edge (Chromium-based) 
+* Safari (macOS and iOS) 

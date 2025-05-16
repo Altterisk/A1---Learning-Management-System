@@ -1,6 +1,6 @@
 
 const User = require('../models/User');
-const UserFactory = require('../factories/userFactory')
+const userFactory = require('../factories/userFactory')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -21,7 +21,7 @@ const registerUser = async (req, res) => {
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: 'User already exists' });
 
-        const user = await UserFactory.createUser({ firstName, lastName, email, password, role, dateOfBirth });
+        const user = await userFactory.createUser({ firstName, lastName, email, password, role, dateOfBirth });
         res.status(201).json({ id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, role: user.role, token: generateToken(user.id) });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -180,7 +180,7 @@ const addUser = async (req, res) => {
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: 'User already exists' });
         const password = generateRandomPassword();
-        const newUser = await UserFactory.createUser({ firstName, lastName, email, password, role, dateOfBirth });
+        const newUser = await userFactory.createUser({ firstName, lastName, email, password, role, dateOfBirth });
         // Should not actually send password in real system, use mail instead
         res.status(201).json({
             user: {

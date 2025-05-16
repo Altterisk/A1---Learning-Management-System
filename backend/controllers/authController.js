@@ -214,6 +214,12 @@ const updateUser = async (req, res) => {
             user.dateOfBirth = new Date(dateOfBirth);
         }
 
+        if (user.role === 'Teacher') {
+            user.description = description || '';
+        } else if (user.role === 'Student') {
+            user.major = major || '';
+        }
+
         const updatedUser = await user.save();
         res.json(updatedUser);
     } catch (error) {

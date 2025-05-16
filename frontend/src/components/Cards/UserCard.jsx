@@ -18,6 +18,19 @@ const UserCard = ({ user, onDelete }) => {
           <span className="font-semibold text-gray-900">Date of Birth:</span>{' '}
           {user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : 'N/A'}
         </p>
+        {user.role === 'Teacher' && (
+          <p className="text-sm text-gray-700 font-medium">
+            <span className="font-semibold text-gray-900">Description:</span>{' '}
+            {user.description || 'N/A'}
+          </p>
+        )}
+
+        {user.role === 'Student' && (
+          <p className="text-sm text-gray-700 font-medium">
+            <span className="font-semibold text-gray-900">Major:</span>{' '}
+            {user.major || 'N/A'}
+          </p>
+        )}
       </div>
 
       {isAdmin && !isTargetAdmin && (

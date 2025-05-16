@@ -23,6 +23,9 @@ const Profile = () => {
     {
       firstName: '',
       lastName: '',
+      dateOfBirth: '',
+      description: '',
+      major: ''
     },
     validate
   );
@@ -37,8 +40,13 @@ const Profile = () => {
   }, [user, setFormData]);
 
   const onSubmit = async () => {
-    try {
-      const response = await axiosInstance.put('/api/auth/profile', formData, {
+    try {      
+      const payload = {
+        ...formData,
+        ...(user.role !== 'Teacher' && { description: undefined }),
+        ...(user.role !== 'Student' && { major: undefined })
+      };
+      const response = await axiosInstance.put('/api/auth/profile', payload, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       updateData(response.data)
@@ -101,7 +109,39 @@ const Profile = () => {
           className="w-full mb-4 p-2 border rounded"
         />
         {errors.dateOfBirth && <p className="text-red-600 mb-2">{errors.dateOfBirth}</p>}
-
+        {user.role === 'Teacher' && (
+          <>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              placeholder="Enter description"
+              value={formData.description}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className="w-full mb-4 p-2 border rounded"
+            />
+          </>
+        )}        
+        {user.role === 'Student' && (
+          <>
+            <label htmlFor="major" className="block text-sm font-medium text-gray-700 mb-1">
+              Major
+            </label>
+            <input
+              type="text"
+              id="major"
+              name="major"
+              placeholder="Enter major"
+              value={formData.major}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className="w-full mb-4 p-2 border rounded"
+            />
+          </>
+        )}
         <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded my-2">
           {loading ? 'Updating...' : 'Update Profile'}
         </button>

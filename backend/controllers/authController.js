@@ -61,6 +61,12 @@ const getProfile = async (req, res) => {
             unreadCount: unreadCount,
             token: generateToken(user.id),
         });
+
+        if (user.role === 'Teacher') {
+            profileData.description = user.description || '';
+        } else if (user.role === 'Student') {
+            profileData.major = user.major || '';
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -89,7 +95,7 @@ const markAllNotificationsRead = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-    const { firstName, lastName, dateOfBirth } = req.body;
+    const { firstName, lastName, dateOfBirth, description, major } = req.body;
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ message: "User not found" });
@@ -101,6 +107,12 @@ const updateProfile = async (req, res) => {
             user.dateOfBirth = null;
         } else if (dateOfBirth) {
             user.dateOfBirth = new Date(dateOfBirth);
+        }
+
+        if (user.role === 'Teacher') {
+            user.description = description || '';
+        } else if (user.role === 'Student') {
+            user.major = major || '';
         }
 
         const updatedUser = await user.save();

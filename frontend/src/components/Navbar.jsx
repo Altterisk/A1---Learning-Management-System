@@ -39,12 +39,6 @@ const Navbar = () => {
           ) : (
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-3'>
               <Link to="/login" className="hover:text-white hover:underline font-bold">Login</Link>
-              <Link
-                to="/register"
-                className="bg-green-500 hover:text-white font-bold px-4 py-2 rounded hover:bg-green-700"
-              >
-                Register
-              </Link>
             </div>
           )}
       </div>
